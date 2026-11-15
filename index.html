@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dahira Safinatoul Amaan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ========== 1) COULEURS ET STYLE : modifie ici pour changer le design ========== */
+:root{
+  --vert:#0e3b2c;        /* couleur principale */
+  --vert-clair:#1d6b4f;  /* boutons, liens */
+  --or:#c9a24b;          /* accents dorés */
+  --fond:#f5f7f4;        /* fond de page */
+  --texte:#1b2a24;       /* texte */
+  --police-titre:'Amiri', Georgia, serif;
+  --police-texte:'Nunito Sans', Arial, sans-serif;
+}
+/* ============================================================================== */
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{font-family:var(--police-texte);background:var(--fond);color:var(--texte);line-height:1.6}
+h1,h2,h3{font-family:var(--police-titre);line-height:1.2}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--or);outline-offset:2px}
+
+/* Menu */
+nav{position:sticky;top:0;z-index:50;background:var(--vert);display:flex;gap:4px;overflow-x:auto;padding:0 12px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav a{color:#fff;text-decoration:none;padding:18px 14px;white-space:nowrap;font-weight:600;font-size:.95rem;border-bottom:3px solid transparent}
+nav a:hover{border-bottom-color:var(--or)}
+
+/* Accueil */
+.hero{position:relative;background:var(--vert);color:#fff;text-align:center;padding:90px 20px 100px;overflow:hidden;
+  background-image:var(--hero-image,none);background-size:cover;background-position:center}
+.hero::before{content:"";position:absolute;inset:-50%;
+  background:
+   repeating-conic-gradient(from 0deg at 50% 50%, rgba(201,162,75,.13) 0 10deg, transparent 10deg 20deg);
+  animation:tourne 120s linear infinite}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at center, rgba(14,59,44,.55), var(--vert) 75%)}
+.hero>*{position:relative;z-index:1}
+@keyframes tourne{to{transform:rotate(360deg)}}
+.hero .arabe{font-family:var(--police-titre);font-size:1.6rem;color:var(--or);margin-bottom:10px}
+.hero h1{font-size:clamp(2.2rem,8vw,4.4rem);letter-spacing:.02em;animation:entree 1.2s ease both}
+.hero p{max-width:560px;margin:18px auto 30px;font-size:1.1rem;opacity:.92;animation:entree 1.2s .25s ease both}
+.hero .boutons{animation:entree 1.2s .5s ease both}
+@keyframes entree{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.btn{display:inline-block;background:var(--or);color:var(--vert);font-weight:700;text-decoration:none;padding:12px 26px;border-radius:999px;margin:5px;transition:transform .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn.clair{background:transparent;color:#fff;border:2px solid var(--or)}
+
+/* Sections */
+section{padding:64px 20px;max-width:1100px;margin:auto}
+section h2{font-size:2.2rem;color:var(--vert);margin-bottom:8px}
+section .intro{max-width:640px;margin-bottom:28px;color:#4a5a53}
+.trait{width:60px;height:4px;background:var(--or);margin-bottom:16px;border-radius:2px}
+.fond-vert{background:var(--vert);max-width:none}
+.fond-vert>div{max-width:1100px;margin:auto}
+.fond-vert h2,.fond-vert .intro{color:#fff}
+
+/* Grilles */
+.grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.carte{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.carte .info{padding:14px 16px}
+.carte h3{font-size:1.25rem;color:var(--vert)}
+.carte small{color:#667;display:block}
+
+/* Responsables */
+.resp .photo{aspect-ratio:1/1;background:linear-gradient(135deg,var(--vert-clair),var(--vert));display:grid;place-items:center;color:var(--or);font-family:var(--police-titre);font-size:3rem}
+.resp img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+
+/* Galerie */
+.galerie{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.galerie button{border:0;padding:0;background:#ddd;border-radius:10px;overflow:hidden;cursor:pointer;aspect-ratio:1/1}
+.galerie img{width:100%;height:100%;object-fit:cover;transition:transform .35s}
+.galerie button:hover img{transform:scale(1.08)}
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;place-items:center;z-index:100;padding:20px}
+#lightbox.ouvert{display:grid}
+#lightbox img{max-width:100%;max-height:85vh;border-radius:8px}
+#lightbox p{color:#fff;text-align:center;margin-top:10px}
+#lightbox .fermer{position:absolute;top:14px;right:18px;background:none;border:0;color:#fff;font-size:2.4rem;cursor:pointer}
+
+/* Vidéos et audios */
+.video{aspect-ratio:16/9;background:#000}
+.video iframe,.video video{width:100%;height:100%;border:0;display:block}
+audio{width:100%;margin-top:10px}
+.audio .info{padding:16px}
+.vide{padding:24px;border:2px dashed #b8c4bd;border-radius:12px;color:#667;background:#fff}
+
+footer{background:var(--vert);color:#fff;text-align:center;padding:34px 20px}
+footer a{color:var(--or)}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#accueil">Accueil</a>
+  <a href="#responsables">Responsables</a>
+  <a href="#galerie">Photos</a>
+  <a href="#temoignages">Témoignages</a>
+  <a href="#conservatoire">Conservatoire</a>
+  <a href="#audios">Audios</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<header class="hero" id="accueil">
+  <div class="arabe">سفينة الأمان</div>
+  <h1>Dahira Safinatoul Amaan</h1>
+  <p>Dahira de la confrérie mouride, à la suite de Cheikh Ahmadou Bamba. Retrouvez ici nos responsables, nos photos, nos témoignages et notre conservatoire.</p>
+  <div class="boutons">
+    <a class="btn" href="#conservatoire">Voir le conservatoire</a>
+    <a class="btn clair" href="#audios">Écouter</a>
+  </div>
+</header>
+
+<section id="responsables">
+  <div class="trait"></div>
+  <h2>Nos responsables</h2>
+  <p class="intro">Les responsables moraux et membres du bureau qui guident le Dahira.</p>
+  <div class="grille" id="zone-resp"></div>
+</section>
+
+<section id="galerie">
+  <div class="trait"></div>
+  <h2>Photos</h2>
+  <p class="intro">Touchez une photo pour l'agrandir.</p>
+  <div class="galerie" id="zone-galerie"></div>
+</section>
+
+<div class="fond-vert" style="padding:64px 20px" id="temoignages">
+  <div>
+    <div class="trait"></div>
+    <h2>Témoignages</h2>
+    <p class="intro">Ce que disent nos membres et nos visiteurs.</p>
+    <div class="grille" id="zone-temoignages" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))"></div>
+  </div>
+</div>
+
+<section id="conservatoire">
+  <div class="trait"></div>
+  <h2>Conservatoire</h2>
+  <p class="intro">Les longues vidéos : conférences, Magal, Gamou, causeries et autres médias volumineux.</p>
+  <div class="grille" id="zone-conservatoire" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))"></div>
+</section>
+
+<section id="audios" style="padding-top:0">
+  <div class="trait"></div>
+  <h2>Audios</h2>
+  <p class="intro">Khassaïdes, sermons et enregistrements sonores.</p>
+  <div class="grille" id="zone-audios" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))"></div>
+</section>
+
+<footer id="contact">
+  <h2 style="margin-bottom:10px">Nous contacter</h2>
+  <p id="zone-contact"></p>
+  <p style="margin-top:18px;opacity:.7;font-size:.9rem">© <span id="annee"></span> Dahira Safinatoul Amaan</p>
+</footer>
+
+<div id="lightbox" onclick="this.classList.remove('ouvert')">
+  <button class="fermer" aria-label="Fermer">&times;</button>
+  <div><img id="lb-img" alt=""><p id="lb-txt"></p></div>
+</div>
+
+<script>
+/* ==========================================================================
+   2) CONTENU DU SITE : c'est ICI que tu ajoutes tes photos, vidéos et audios.
+   Pour ajouter un élément : copie une ligne, colle-la dessous, change le texte.
+   Attention à garder les virgules et les guillemets.
+   ========================================================================== */
+
+// Image de fond de l'accueil (laisse vide "" pour garder le motif vert/doré)
+const IMAGE_ACCUEIL = "";   // exemple : "images/accueil.jpg"
+
+// Contact
+const CONTACT = {
+  telephone: "+221 00 000 00 00",
+  email: "contact@exemple.com",
+  adresse: "Ville, Pays"
+};
+
+// Responsables moraux et membres haut gradés
+// "photo" : laisse vide "" si tu n'as pas encore la photo (les initiales s'affichent)
+const RESPONSABLES = [
+  { nom: "Serigne Exemple", role: "Responsable moral", photo: "" },
+  { nom: "Nom Prénom",      role: "Président du Dahira", photo: "" },
+  { nom: "Nom Prénom",      role: "Secrétaire général", photo: "" },
+  { nom: "Nom Prénom",      role: "Trésorier", photo: "" }
+];
+
+// Photos : mets tes fichiers dans le dossier "images"
+const PHOTOS = [
+  // { src: "images/magal1.jpg", titre: "Magal de Touba" },
+];
+
+// Témoignages vidéo : lien YouTube OU fichier dans le dossier "videos"
+const TEMOIGNAGES = [
+  // { titre: "Témoignage de Mame Fatou", url: "https://www.youtube.com/watch?v=XXXXXXXXXXX" },
+  // { titre: "Témoignage de Modou",      url: "videos/modou.mp4" },
+];
+
+// Conservatoire : longues vidéos (conseil : mets-les sur YouTube et colle le lien)
+const CONSERVATOIRE = [
+  // { titre: "Conférence du Magal 2026", url: "https://www.youtube.com/watch?v=XXXXXXXXXXX", infos: "2 h 15" },
+];
+
+// Audios : fichiers dans le dossier "audios"
+const AUDIOS = [
+  // { titre: "Khassaïde - Jazbu", url: "audios/jazbu.mp3", infos: "Récitation" },
+];
+
+/* ==========================================================================
+   FIN DE LA ZONE À MODIFIER : ne touche pas à ce qui est en dessous
+   ========================================================================== */
+
+const $ = id => document.getElementById(id);
+const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const vide = txt => `<div class="vide">${txt}</div>`;
+
+if (IMAGE_ACCUEIL) document.querySelector('.hero').style.setProperty('--hero-image', `url("${IMAGE_ACCUEIL}")`);
+
+$('zone-resp').innerHTML = RESPONSABLES.map(r => {
+  const ini = r.nom.split(' ').map(m => m[0]).slice(0,2).join('').toUpperCase();
+  const photo = r.photo ? `<img src="${esc(r.photo)}" alt="${esc(r.nom)}" loading="lazy">` : `<div class="photo">${ini}</div>`;
+  return `<div class="carte resp">${photo}<div class="info"><h3>${esc(r.nom)}</h3><small>${esc(r.role)}</small></div></div>`;
+}).join('');
+
+$('zone-galerie').innerHTML = PHOTOS.length
+  ? PHOTOS.map((p,i) => `<button onclick="agrandir(${i})" aria-label="${esc(p.titre||'Photo')}"><img src="${esc(p.src)}" alt="${esc(p.titre||'')}" loading="lazy"></button>`).join('')
+  : vide('Les photos arrivent bientôt.');
+
+function agrandir(i){
+  $('lb-img').src = PHOTOS[i].src;
+  $('lb-txt').textContent = PHOTOS[i].titre || '';
+  $('lightbox').classList.add('ouvert');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('lightbox').classList.remove('ouvert'); });
+
+function lecteur(url){
+  const m = url.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/);
+  if (m) return `<iframe src="https://www.youtube-nocookie.com/embed/${m[1]}" loading="lazy" allowfullscreen title="Vidéo"></iframe>`;
+  return `<video src="${esc(url)}" controls preload="none"></video>`;
+}
+function videos(liste, zone, msg){
+  $(zone).innerHTML = liste.length
+    ? liste.map(v => `<div class="carte"><div class="video">${lecteur(v.url)}</div><div class="info"><h3>${esc(v.titre)}</h3>${v.infos?`<small>${esc(v.infos)}</small>`:''}</div></div>`).join('')
+    : vide(msg);
+}
+videos(TEMOIGNAGES, 'zone-temoignages', 'Les témoignages arrivent bientôt.');
+videos(CONSERVATOIRE, 'zone-conservatoire', 'Le conservatoire sera bientôt rempli.');
+
+$('zone-audios').innerHTML = AUDIOS.length
+  ? AUDIOS.map(a => `<div class="carte audio"><div class="info"><h3>${esc(a.titre)}</h3>${a.infos?`<small>${esc(a.infos)}</small>`:''}<audio controls preload="none" src="${esc(a.url)}"></audio></div></div>`).join('')
+  : vide('Les audios arrivent bientôt.');
+
+$('zone-contact').innerHTML = `${esc(CONTACT.telephone)}<br><a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a><br>${esc(CONTACT.adresse)}`;
+$('annee').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
