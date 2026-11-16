@@ -845,7 +845,7 @@ const PHOTO_SERIGNE = "serigne.jpg.JPG";
 /* ========== FIN ========== */
 (function(){
 var h=document.querySelector('.hero');if(!h)return;
-var logo=getComputedStyle(h).backgroundImage;
+var logo=getComputedStyle(h).getPropertyValue('--hero-image').trim();
 var p=document.createElement('div');p.className='h-photo';
 var im=new Image();im.alt='';im.src=PHOTO_SERIGNE;
 im.onerror=function(){p.remove()};
@@ -855,17 +855,5 @@ if(logo&&logo!=='none')l.style.backgroundImage=logo;
 h.prepend(l);h.prepend(p);
 })();
 </script>
-
-  
-
-
-
-
-  
-
-
-
-
-
 </body>
 </html>
