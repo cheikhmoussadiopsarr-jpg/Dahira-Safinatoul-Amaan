@@ -827,6 +827,36 @@ new MutationObserver(sync).observe(r,{attributes:true,attributeFilter:['data-the
 sync();
 })();
 </script>
+  <style>
+.hero::before{display:none!important}
+.hero{background-image:none!important}
+.hero::after{z-index:1!important}
+.hero>.h-photo{position:absolute;inset:0;z-index:0;overflow:hidden;opacity:0;animation:hfondu 2.5s ease forwards}
+.h-photo img{width:100%;height:100%;object-fit:cover;object-position:center 20%;-webkit-mask-image:radial-gradient(ellipse at center,#000 40%,transparent 78%);mask-image:radial-gradient(ellipse at center,#000 40%,transparent 78%);opacity:.55;animation:hderive 24s ease-in-out infinite alternate}
+.hero>.h-logo{position:absolute;inset:0;z-index:2;background-size:contain;background-repeat:no-repeat;background-position:center;pointer-events:none}
+.hero>:not(.h-photo):not(.h-logo){z-index:3}
+@keyframes hfondu{to{opacity:1}}
+@keyframes hderive{from{transform:scale(1.03) translateY(0)}to{transform:scale(1.1) translateY(-2%)}}
+@media(prefers-reduced-motion:reduce){.h-photo img{animation:none}}
+</style>
+<script>
+/* ========== PHOTO D'ACCUEIL : écris le nom exact du fichier ========== */
+const PHOTO_SERIGNE = "serigne.jpg.JPG";
+/* ========== FIN ========== */
+(function(){
+var h=document.querySelector('.hero');if(!h)return;
+var logo=getComputedStyle(h).backgroundImage;
+var p=document.createElement('div');p.className='h-photo';
+var im=new Image();im.alt='';im.src=PHOTO_SERIGNE;
+im.onerror=function(){p.remove()};
+p.appendChild(im);
+var l=document.createElement('div');l.className='h-logo';
+if(logo&&logo!=='none')l.style.backgroundImage=logo;
+h.prepend(l);h.prepend(p);
+})();
+</script>
+
+  
 
 
 
