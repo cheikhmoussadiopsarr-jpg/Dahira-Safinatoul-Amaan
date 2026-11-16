@@ -270,5 +270,113 @@ $('zone-audios').innerHTML = AUDIOS.length
 $('zone-contact').innerHTML = `${esc(CONTACT.telephone)}<br><a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a><br>${esc(CONTACT.adresse)}`;
 $('annee').textContent = new Date().getFullYear();
 </script>
+  <style>
+#albums .al-prochain{background:#fff;border-left:4px solid var(--or);padding:10px 14px;border-radius:8px;margin-bottom:16px}
+.al-cats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.al-cat{display:flex;align-items:center;gap:10px;background:var(--vert);color:#fff;border:2px solid transparent;border-radius:14px;padding:12px;text-align:left;font:inherit;cursor:pointer}
+.al-cat.on{border-color:var(--or)}
+.al-cat b{display:block;font-family:var(--police-titre);font-size:1.1rem}
+.al-cat small{opacity:.8;font-size:.78rem}
+.al-ico{width:38px;height:38px;border-radius:10px;background:rgba(201,162,75,.22);color:var(--or);display:grid;place-items:center;font-weight:700;flex:none}
+.al-search{width:100%;padding:13px 16px;border:1px solid #c9d3cd;border-radius:12px;font:inherit;margin-bottom:12px;background:#fff}
+.al-annees{display:flex;gap:8px;overflow-x:auto;margin-bottom:16px}
+.al-chip{border:1px solid var(--vert-clair);background:#fff;color:var(--vert);border-radius:999px;padding:6px 14px;font:inherit;cursor:pointer;white-space:nowrap}
+.al-chip.on{background:var(--vert);color:#fff}
+.al-liste{display:grid;gap:10px}
+.al-ligne{display:flex;gap:14px;align-items:center;width:100%;background:#fff;border:0;border-radius:14px;padding:10px;text-align:left;font:inherit;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.al-couv{width:76px;height:76px;border-radius:12px;flex:none;object-fit:cover;display:grid;place-items:center;text-align:center;line-height:1.1;color:#fff;background:linear-gradient(135deg,var(--vert-clair),var(--vert))}
+.al-couv b{font-family:var(--police-titre);font-size:1.7rem;color:var(--or);display:block}
+.al-couv span{font-size:.72rem}
+.al-ligne h3{font-size:1.15rem;color:var(--vert)}
+.al-ligne small{color:#667;display:block}
+.al-pill{display:inline-block;background:#e8efe9;color:var(--vert);border-radius:999px;padding:2px 10px;font-size:.8rem;margin-top:4px}
+#al-vue{position:fixed;inset:0;z-index:90;background:var(--fond);overflow-y:auto;display:none;padding:16px 16px 40px}
+#al-vue.on{display:block}
+.al-contenu{max-width:1100px;margin:auto}
+.al-retour{background:var(--vert);color:#fff;border:0;border-radius:999px;padding:10px 20px;font:inherit;font-weight:700;cursor:pointer;margin-bottom:16px}
+#al-lb{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;place-items:center;z-index:120;padding:20px;color:#fff;text-align:center}
+#al-lb.on{display:grid}
+#al-lb img{max-width:100%;max-height:85vh;border-radius:8px}
+</style>
+
+<script>
+/* ========== ALBUMS : ajoute tes dossiers ici ==========
+   cat : "jour" (Jour de Dahira), "magal", "qadr" (Laylatoul Qadr) ou "gamou"
+   date : AAAA-MM-JJ (obligatoire)   hijri : facultatif   titre : facultatif
+   Pour activer un exemple : enlève les // au début de la ligne.
+   Copie un bloc { ... }, colle-le dessous, change les infos.
+*/
+const DAHIRA_ALBUMS = [
+  // { cat:"jour", date:"AAAA-MM-JJ", couverture:"",
+  //   photos:[{src:"jd1.jpg.JPG",titre:"Récitation"}],
+  //   videos:[{titre:"Kourel du Dahira",url:"https://www.youtube.com/watch?v=XXXXXXXXXXX"}],
+  //   audios:[{titre:"Khassaïde",url:"audio1.mp3"}] },
+  // { cat:"magal", titre:"Magal de Touba", date:"AAAA-MM-JJ", hijri:"18 Safar", photos:[], videos:[], audios:[] },
+  // { cat:"qadr", titre:"Laylatoul Qadr", date:"AAAA-MM-JJ", hijri:"27 Ramadan", photos:[], videos:[], audios:[] },
+  // { cat:"gamou", titre:"Gamou", date:"AAAA-MM-JJ", hijri:"12 Rabi'ul Awwal", photos:[], videos:[], audios:[] },
+];
+/* ========== FIN DE LA ZONE ALBUMS : ne touche pas en dessous ========== */
+
+(function(){
+const CATS=[{id:'jour',nom:'Jour de Dahira',sig:'JD'},{id:'magal',nom:'Magal',sig:'M'},{id:'qadr',nom:'Laylatoul Qadr',sig:'LQ'},{id:'gamou',nom:'Gamou',sig:'G'}];
+const $=id=>document.getElementById(id);
+const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const LISTE=DAHIRA_ALBUMS.slice().sort((a,b)=>b.date.localeCompare(a.date));
+const nb=a=>(a.photos||[]).length+(a.videos||[]).length+(a.audios||[]).length;
+const D=s=>{const p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]);};
+const longue=a=>D(a.date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const nomCat=id=>(CATS.find(c=>c.id===id)||{}).nom||'';
+const titre=a=>a.titre||nomCat(a.cat);
+const texte=a=>[titre(a),a.date,longue(a),a.hijri||''].join(' ').toLowerCase();
+const lect=url=>{const m=url.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/);return m?`<iframe src="https://www.youtube-nocookie.com/embed/${m[1]}" loading="lazy" allowfullscreen title="Vidéo"></iframe>`:`<video src="${esc(url)}" controls preload="none"></video>`;};
+let cat='',an='',q='';
+
+const sec=document.createElement('section');sec.id='albums';
+sec.innerHTML='<div class="trait"></div><h2>Albums</h2><p class="intro">Retrouve les photos, vidéos et audios de chaque rendez-vous du Dahira.</p><div class="al-prochain" id="al-proch"></div><div class="al-cats" id="al-cats"></div><input class="al-search" id="al-q" type="search" placeholder="Chercher (ex : Magal, Gamou)…"><div class="al-annees" id="al-ans"></div><div class="al-liste" id="al-liste"></div>';
+$('galerie').before(sec);
+const nav=document.querySelector('nav a[href="#galerie"]');
+if(nav)nav.insertAdjacentHTML('beforebegin','<a href="#albums">Albums</a>');
+document.body.insertAdjacentHTML('beforeend','<div id="al-vue"></div><div id="al-lb"><div><img alt=""><p></p></div></div>');
+
+const pd=(function(){const d=new Date();d.setHours(0,0,0,0);for(let i=0;i<40;i++){if(d.getDay()===4&&d.getDate()>7)return d;d.setDate(d.getDate()+1);}})();
+$('al-proch').innerHTML='Prochain Jour de Dahira : <b>'+pd.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})+'</b>';
+
+function rend(){
+  $('al-cats').innerHTML=CATS.map(c=>{const l=LISTE.filter(a=>a.cat===c.id);const n=l.reduce((s,a)=>s+nb(a),0);
+    return `<button class="al-cat ${cat===c.id?'on':''}" data-cat="${c.id}"><span class="al-ico">${c.sig}</span><span><b>${c.nom}</b><small>${l.length} dossier(s), ${n} élément(s)</small></span></button>`;}).join('');
+  const ans=[...new Set(LISTE.map(a=>a.date.slice(0,4)))];
+  $('al-ans').innerHTML=ans.length?[''].concat(ans).map(y=>`<button class="al-chip ${an===y?'on':''}" data-an="${y}">${y||'Toutes les années'}</button>`).join(''):'';
+  const l=LISTE.filter(a=>(!cat||a.cat===cat)&&(!an||a.date.startsWith(an))&&(!q||texte(a).includes(q)));
+  $('al-liste').innerHTML=l.length?l.map(a=>{const d=D(a.date);
+    const couv=a.couverture?`<img class="al-couv" src="${esc(a.couverture)}" alt="" loading="lazy">`:`<div class="al-couv"><div><b>${d.getDate()}</b><span>${d.toLocaleDateString('fr-FR',{month:'short',year:'numeric'})}</span></div></div>`;
+    return `<button class="al-ligne" data-open="${LISTE.indexOf(a)}">${couv}<span><h3>${esc(titre(a))}</h3><small>${esc(longue(a))}${a.hijri?' · '+esc(a.hijri):''}</small><span class="al-pill">${nb(a)} éléments</span></span></button>`;}).join(''):'<div class="vide">Aucun album pour le moment.</div>';
+}
+function ouvrir(i,tab){
+  const a=LISTE[i];const T=[['photos','Photos'],['videos','Vidéos'],['audios','Audios']].filter(t=>(a[t[0]]||[]).length);
+  tab=tab||(T[0]&&T[0][0]);
+  let h=`<div class="al-contenu"><button class="al-retour" data-close>Retour</button><h2 style="color:var(--vert)">${esc(titre(a))}</h2><p style="color:#667;margin-bottom:14px">${esc(longue(a))}${a.hijri?' · '+esc(a.hijri):''}</p>`;
+  h+='<div class="al-annees">'+T.map(t=>`<button class="al-chip ${t[0]===tab?'on':''}" data-tab="${t[0]}" data-i="${i}">${t[1]} (${a[t[0]].length})</button>`).join('')+'</div>';
+  if(tab==='photos')h+='<div class="galerie">'+a.photos.map((p,k)=>`<button data-photo="${k}" data-i="${i}"><img src="${esc(p.src)}" alt="${esc(p.titre||'')}" loading="lazy"></button>`).join('')+'</div>';
+  if(tab==='videos')h+='<div class="grille" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">'+a.videos.map(v=>`<div class="carte"><div class="video">${lect(v.url)}</div><div class="info"><h3>${esc(v.titre||'')}</h3></div></div>`).join('')+'</div>';
+  if(tab==='audios')h+='<div class="grille" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">'+a.audios.map(x=>`<div class="carte audio"><div class="info"><h3>${esc(x.titre||'')}</h3><audio controls preload="none" src="${esc(x.url)}"></audio></div></div>`).join('')+'</div>';
+  if(!T.length)h+='<div class="vide">Cet album est vide pour le moment.</div>';
+  $('al-vue').innerHTML=h+'</div>';$('al-vue').classList.add('on');
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-cat],[data-an],[data-open],[data-close],[data-tab],[data-photo],#al-lb');if(!t)return;
+  const d=t.dataset;
+  if(t.id==='al-lb'){t.classList.remove('on');return;}
+  if('cat' in d){cat=cat===d.cat?'':d.cat;rend();}
+  else if('an' in d){an=d.an;rend();}
+  else if('open' in d){ouvrir(+d.open);$('al-vue').scrollTop=0;}
+  else if('close' in d){$('al-vue').classList.remove('on');}
+  else if('tab' in d){ouvrir(+d.i,d.tab);}
+  else if('photo' in d){const p=LISTE[+d.i].photos[+d.photo];const lb=$('al-lb');lb.querySelector('img').src=p.src;lb.querySelector('p').textContent=p.titre||'';lb.classList.add('on');}
+});
+$('al-q').addEventListener('input',e=>{q=e.target.value.toLowerCase().trim();rend();});
+rend();
+})();
+</script>
+
 </body>
 </html>
