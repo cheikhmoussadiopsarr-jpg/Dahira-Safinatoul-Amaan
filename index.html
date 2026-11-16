@@ -398,6 +398,20 @@ const b=document.createElement('button');b.className='haut';b.textContent='Haut'
 addEventListener('scroll',()=>b.classList.toggle('on',scrollY>600));
 })();
 </script>
+  <style>
+.resp img{cursor:zoom-in}
+#lightbox img{object-fit:contain}
+</style>
+<script>
+document.addEventListener('click',function(e){
+  var img=e.target.closest('.resp img');
+  if(!img)return;
+  document.getElementById('lb-img').src=img.src;
+  document.getElementById('lb-txt').textContent=img.alt||'';
+  document.getElementById('lightbox').classList.add('ouvert');
+});
+</script>
+
 
 
 </body>
