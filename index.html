@@ -474,6 +474,81 @@ const c=document.querySelector('.dec-carte[href="#galerie"]');
 if(c){c.href='#bureau';c.innerHTML='<b>Bureau administratif</b><span>Membres du bureau et pôles administratifs</span>';}
 })();
 </script>
+  <style>
+.bu-p{cursor:pointer;position:relative;padding-right:30px}
+.bu-p::after{content:"›";position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--or);font-size:1.5rem}
+.bu-p:hover{outline:2px solid var(--or)}
+.co-grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.co-c{background:#fff;border-left:4px solid var(--or);border-radius:10px;padding:10px 12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.co-c b{display:block;font-size:.92rem;color:var(--vert)}
+.co-c span{display:block;font-size:.78rem;color:#4a5a53;line-height:1.3;margin-top:2px}
+.co-c small{display:block;font-size:.76rem;margin-top:5px;color:var(--vert-clair)}
+#pole-vue{position:fixed;inset:0;z-index:95;background:var(--fond);overflow-y:auto;display:none;padding:16px 16px 40px}
+#pole-vue.on{display:block}
+.pv{max-width:700px;margin:auto}
+.pv h2{color:var(--vert);font-size:1.9rem;margin-bottom:12px}
+.pv h4{font-family:var(--police-titre);font-size:1.2rem;color:var(--vert);margin:20px 0 8px}
+.pv-retour{background:var(--vert);color:#fff;border:0;border-radius:999px;padding:10px 20px;font:inherit;font-weight:700;cursor:pointer;margin-bottom:14px}
+.pv-resp{background:var(--vert);color:#fff;border-radius:12px;padding:12px 14px;font-weight:700}
+.pv-m{display:flex;gap:10px;align-items:center;background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.pv-m b{color:var(--vert);min-width:110px}
+.pv-vide{color:#9aa7a0}
+</style>
+<script>
+/* ========== POLES : remplis les détails ici ==========
+   activite : ce que fait le pôle
+   responsable : nom du responsable
+   membres : { role:"Accueil", nom:"Nom Prénom" }
+   Ajoute un membre : copie une ligne { role:"", nom:"" }, colle-la dessous.
+*/
+const POLES_INFO = {
+  "Accueil et information": {
+    activite:"Accueil des membres et des visiteurs, et diffusion de l'information du Dahira.",
+    responsable:"",
+    membres:[ { role:"Accueil", nom:"Mansour Ka" }, { role:"Information", nom:"Cheikh Moussa D Sarr" } ]
+  },
+  "Tenue des agendas":{ activite:"", responsable:"", membres:[] },
+  "Gestion des ressources humaines":{ activite:"", responsable:"", membres:[] },
+  "Gestion logistique et matérielle":{ activite:"", responsable:"", membres:[] },
+  "Archives":{ activite:"", responsable:"", membres:[] }
+};
+const COMMISSIONS = [
+  { nom:"Organisation", resp:"Khadim Ndiaye", txt:"Prépare et coordonne les événements et rencontres." },
+  { nom:"Culturel", resp:"Khadim Diop", txt:"Transmission du savoir, khassaïdes et enseignements." },
+  { nom:"Multimédia", resp:"Ahmadou Wilan Ndiaye", txt:"Photos, vidéos, audios et site du Dahira." },
+  { nom:"Finance", resp:"Fallou Diop", txt:"Gestion des cotisations et des dépenses." },
+  { nom:"Secrétariat Général", resp:"Mansour Ka", txt:"Coordination administrative, comptes rendus et courriers." }
+];
+/* ========== FIN DE LA ZONE POLES ========== */
+
+(function(){
+const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const vide='<span class="pv-vide">À compléter</span>';
+document.body.insertAdjacentHTML('beforeend','<div id="pole-vue"></div>');
+const vue=document.getElementById('pole-vue');
+function ouvrir(t){
+  const p=POLES_INFO[t]||{};const m=p.membres||[];
+  vue.innerHTML='<div class="pv"><button class="pv-retour" data-fermer>Retour</button><h2>'+esc(t)+'</h2>'
+   +'<h4>Activité</h4><p>'+(p.activite?esc(p.activite):vide)+'</p>'
+   +'<h4>Responsable</h4><div class="pv-resp">'+(p.responsable?esc(p.responsable):'—')+'</div>'
+   +'<h4>Membres du pôle</h4>'+(m.length?m.map(x=>'<div class="pv-m"><b>'+esc(x.role)+'</b><span>'+esc(x.nom)+'</span></div>').join(''):'<p>'+vide+'</p>')+'</div>';
+  vue.classList.add('on');vue.scrollTop=0;
+}
+document.querySelectorAll('.bu-p').forEach(c=>{
+  const b=c.querySelector('b');
+  if(b&&b.textContent==='Accueil et communication'){b.textContent='Accueil et information';const s=c.querySelector('span');if(s)s.textContent="Accueil des membres et information du Dahira.";}
+  const t=b?b.textContent:'';
+  c.setAttribute('role','button');c.tabIndex=0;
+  c.addEventListener('click',()=>ouvrir(t));
+  c.addEventListener('keydown',e=>{if(e.key==='Enter')ouvrir(t);});
+});
+vue.addEventListener('click',e=>{if(e.target.closest('[data-fermer]'))vue.classList.remove('on');});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')vue.classList.remove('on');});
+const bu=document.querySelector('#bureau');
+if(bu)bu.insertAdjacentHTML('beforeend','<h3>Commissions</h3><div class="co-grille">'+COMMISSIONS.map(c=>'<div class="co-c"><b>'+esc(c.nom)+'</b><span>'+esc(c.txt)+'</span><small>Responsable : '+esc(c.resp)+'</small></div>').join('')+'</div>');
+})();
+</script>
+
 
 
 
