@@ -636,6 +636,115 @@ if(sheet)document.addEventListener('click',function(e){
 },true);
 })();
 </script>
+  <style>
+:root{--marge-bas:20px}
+html{font-size:clamp(16px,.5vw + 14px,18px)}
+section,.decouvrir{padding-inline:clamp(14px,4vw,32px)}
+.decouvrir{padding-bottom:var(--marge-bas)}
+.panel:not([data-id="accueil"]){padding-bottom:calc(var(--marge-bas) + env(safe-area-inset-bottom,0px))}
+.panel[data-id="accueil"] #contact{padding-bottom:calc(34px + var(--marge-bas) + env(safe-area-inset-bottom,0px))}
+
+.dec-carte,.bu-m,.bu-p,.co-c,.al-ligne{transition:transform .2s ease}
+@media(hover:hover){.dec-carte:hover,.bu-m:hover,.co-c:hover,.al-ligne:hover{transform:translateY(-3px)}}
+.dec-carte:active,.bu-m:active,.bu-p:active,.al-ligne:active{transform:scale(.98)}
+.panel.act :is(.dec-carte,.bu-m,.bu-p,.co-c,.al-ligne,.carte){animation:carte .45s ease backwards;animation-delay:calc(var(--i,0)*45ms)}
+@keyframes carte{from{opacity:0;transform:translateY(14px)}}
+
+.mb-q{width:100%;padding:13px 16px;border:1px solid #c9d3cd;border-radius:12px;font:inherit;margin-bottom:10px;background:#fff;color:var(--texte)}
+.mb-nb{font-size:.85rem;color:#667;margin-bottom:12px}
+.mb-liste{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+[data-theme="dark"] .mb-q{background:var(--carte);color:var(--texte);border-color:#2c4a3c}
+[data-theme="dark"] .mb-nb{color:#9fb0a7}
+
+@media(min-width:700px){
+  .dec-grille{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+  .al-cats{grid-template-columns:repeat(4,1fr)}
+}
+@media(min-width:900px){
+  nav{padding:0 24px}
+  nav a{padding:18px 18px}
+  .pv{max-width:760px}
+  #pole-vue{max-height:75vh}
+}
+@media(max-width:380px){
+  nav a{padding:18px 10px;font-size:.88rem}
+  .dec-grille,.al-cats{grid-template-columns:1fr}
+}
+</style>
+<script>
+/* ========== MEMBRES DU DAHIRA : ajoute les noms ici ==========
+   nom : nom du membre     info : facultatif (commission, rôle...)
+   Pour ajouter : copie une ligne, colle-la dessous, change le texte.
+   Enlève les // pour activer un exemple.
+*/
+const MEMBRES_DAHIRA = [
+  // { nom:"Prénom Nom", info:"" },
+  // { nom:"Prénom Nom", info:"Commission culturelle" },
+];
+/* ========== FIN DE LA ZONE MEMBRES ========== */
+
+(function(){
+var track=document.getElementById('track'),nav=document.querySelector('nav');
+if(!track||!nav)return;
+var esc=function(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var calme=matchMedia('(prefers-reduced-motion: reduce)').matches;
+var USER='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>';
+
+/* Page Membres */
+var sec=document.createElement('section');sec.id='membres';
+sec.innerHTML='<div class="trait"></div><h2>Membres du Dahira</h2><p class="intro">Tous les membres qui font vivre le Dahira Safinatoul Amaan.</p><input class="mb-q" id="mb-q" type="search" placeholder="Chercher un membre…"><p class="mb-nb" id="mb-nb"></p><div class="mb-liste" id="mb-liste"></div>';
+var panel=document.createElement('div');panel.className='panel';panel.dataset.id='membres';panel.appendChild(sec);track.appendChild(panel);
+var idx=track.children.length-1;
+
+/* Carte dans l'accueil + onglet dans le menu */
+var dg=document.querySelector('.dec-grille');
+if(dg)dg.insertAdjacentHTML('beforeend','<a class="dec-carte" href="#membres"><b>Membres</b><span>La liste de tous les membres du Dahira</span></a>');
+var lk=document.createElement('a');lk.href='#membres';lk.textContent='Membres';
+var au=nav.querySelector('a[href="#audios"]');
+if(au)au.after(lk);else nav.insertBefore(lk,nav.querySelector('.theme'));
+
+/* Liste des membres */
+var LISTE=MEMBRES_DAHIRA.slice().sort(function(a,b){return a.nom.localeCompare(b.nom,'fr')});
+var liste=document.getElementById('mb-liste'),nb=document.getElementById('mb-nb'),q='';
+function stagger(el){[].forEach.call(el.children,function(c,i){c.style.setProperty('--i',Math.min(i,8))})}
+function rend(){
+  var l=LISTE.filter(function(m){return !q||(m.nom+' '+(m.info||'')).toLowerCase().indexOf(q)>-1});
+  nb.textContent=LISTE.length?LISTE.length+' membre'+(LISTE.length>1?'s':''):'';
+  liste.innerHTML=l.length?l.map(function(m){return '<div class="bu-m"><div class="bu-ico">'+USER+'</div><div><b>'+esc(m.nom)+'</b>'+(m.info?'<small>'+esc(m.info)+'</small>':'')+'</div></div>'}).join(''):'<div class="vide">'+(LISTE.length?'Aucun membre trouvé.':'La liste des membres sera bientôt disponible.')+'</div>';
+  stagger(liste);
+}
+document.getElementById('mb-q').addEventListener('input',function(e){q=e.target.value.toLowerCase().trim();rend()});
+rend();
+['.dec-grille','.bu-membres','.bu-poles','.co-grille','.grille','.al-liste'].forEach(function(s){document.querySelectorAll(s).forEach(stagger)});
+
+/* Navigation vers la page Membres */
+function aller(i){track.scrollTo({left:i*track.clientWidth,behavior:calme?'auto':'smooth'});var p=track.children[i];if(p)p.scrollTo({top:0})}
+document.addEventListener('click',function(e){
+  var a=e.target.closest('a[href="#membres"]');if(!a)return;
+  e.preventDefault();e.stopPropagation();aller(idx);
+},true);
+
+/* Menu surligné + apparition douce des cartes */
+var last=0,raf=0;
+function maj(i){
+  var p=track.children[i],id=p.dataset.id;
+  [].forEach.call(nav.querySelectorAll('a[href^="#"]'),function(a){
+    var on=a.getAttribute('href')==='#'+id;a.classList.toggle('on',on);
+    if(on)nav.scrollTo({left:a.offsetLeft-nav.clientWidth/2+a.offsetWidth/2,behavior:calme?'auto':'smooth'});
+  });
+  p.classList.add('act');setTimeout(function(){p.classList.remove('act')},900);
+}
+track.addEventListener('scroll',function(){
+  if(raf)return;
+  raf=requestAnimationFrame(function(){
+    raf=0;var i=Math.round(track.scrollLeft/track.clientWidth);
+    if(i===last||!track.children[i])return;last=i;maj(i);
+  });
+});
+addEventListener('resize',function(){track.scrollTo({left:last*track.clientWidth})});
+})();
+</script>
+
 
   
 
