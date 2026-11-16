@@ -744,6 +744,40 @@ track.addEventListener('scroll',function(){
 addEventListener('resize',function(){track.scrollTo({left:last*track.clientWidth})});
 })();
 </script>
+  <style>
+:root{--duree:1.2s}
+#track .panel.act>*{animation:none}
+#track .panel.act :is(.dec-carte,.bu-m,.bu-p,.co-c,.al-ligne,.carte){animation:none}
+#track .panel.doux :is(.dec-carte,.bu-m,.bu-p,.co-c,.al-ligne,.carte){animation:douce var(--duree) ease-out backwards;animation-delay:calc(var(--i,0)*90ms)}
+@keyframes douce{from{opacity:0;transform:translateY(8px)}}
+.dec-carte,.bu-m,.bu-p,.co-c,.al-ligne{transition:transform .6s ease-out}
+@media(hover:hover){.dec-carte:hover,.bu-m:hover,.co-c:hover,.al-ligne:hover{transform:translateY(-2px)}}
+.dec-carte:active,.bu-m:active,.bu-p:active,.al-ligne:active{transform:scale(.99)}
+.galerie img,.resp img,.al-couv{transition:transform var(--duree) ease-out}
+.galerie button:hover img{transform:scale(1.03)}
+#lightbox.ouvert img,#al-lb.on img{animation:fondu .7s ease-out}
+#al-vue.on .al-contenu{animation:fondu .6s ease-out}
+@keyframes fondu{from{opacity:0}}
+#pole-vue{transition:transform .5s ease-out,visibility 0s .5s}
+#pole-vue.on{transition:transform .5s ease-out}
+</style>
+<script>
+(function(){
+var t=document.getElementById('track');if(!t)return;
+var last=-1,tm;
+function doux(i){
+  var p=t.children[i];if(!p||i===last)return;last=i;
+  p.classList.add('doux');
+  setTimeout(function(){p.classList.remove('doux')},4000);
+}
+t.addEventListener('scroll',function(){
+  clearTimeout(tm);
+  tm=setTimeout(function(){doux(Math.round(t.scrollLeft/t.clientWidth))},120);
+});
+doux(0);
+})();
+</script>
+
 
 
   
