@@ -411,6 +411,69 @@ document.addEventListener('click',function(e){
   document.getElementById('lightbox').classList.add('ouvert');
 });
 </script>
+  <style>
+#bureau h3{font-family:var(--police-titre);font-size:1.35rem;color:var(--vert);margin:24px 0 12px}
+.bu-membres{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.bu-m{display:flex;gap:10px;align-items:center;background:#fff;border-radius:12px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.bu-ico{flex:none;width:38px;height:38px;border-radius:50%;background:var(--vert);color:var(--or);display:grid;place-items:center}
+.bu-ico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.bu-m b{display:block;font-size:.9rem;color:var(--vert);line-height:1.2}
+.bu-m span{display:block;font-size:.85rem;line-height:1.25}
+.bu-m small{display:block;font-size:.74rem;color:#667}
+.bu-m .sans-nom{color:#9aa7a0}
+.bu-poles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.bu-p{display:flex;gap:10px;background:var(--vert);color:#fff;border-radius:12px;padding:12px}
+.bu-p .bu-ico{width:34px;height:34px;border-radius:10px;background:rgba(201,162,75,.2)}
+.bu-p b{display:block;font-size:.92rem}
+.bu-p span{display:block;font-size:.78rem;opacity:.85;line-height:1.3;margin-top:2px}
+</style>
+<script>
+/* ========== BUREAU : remplis les noms et postes ici ==========
+   poste : le poste au Dahira (affiché en gras)
+   nom   : le nom du membre   pole : affiliation (facultatif)
+   Exemple : { poste:"Président", nom:"Serigne Exemple", pole:"Direction" },
+*/
+const BUREAU_DAHIRA = [
+  { poste:"", nom:"", pole:"" },
+  { poste:"", nom:"", pole:"" },
+  { poste:"", nom:"", pole:"" },
+  { poste:"", nom:"", pole:"" },
+  { poste:"", nom:"", pole:"" },
+  { poste:"", nom:"", pole:"" },
+  { poste:"", nom:"", pole:"" },
+  { poste:"", nom:"", pole:"" },
+  { poste:"", nom:"", pole:"" },
+  { poste:"", nom:"", pole:"" }
+];
+/* ========== FIN DE LA ZONE BUREAU ========== */
+
+(function(){
+const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const svg=p=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+p+'</svg>';
+const USER='<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>';
+const POLES=[
+ ['<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>','Accueil et communication','Accueil des membres, information et communication du Dahira.'],
+ ['<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>','Tenue des agendas','Planification des rencontres, rendez-vous et événements.'],
+ ['<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>','Gestion des ressources humaines','Suivi des membres, des commissions et de la mobilisation.'],
+ ['<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>','Gestion logistique et matérielle','Matériel, sonorisation, locaux et organisation pratique.'],
+ ['<rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/>','Archives','Conservation des documents, comptes rendus et souvenirs.']
+];
+let h='<div class="trait"></div><h2>Bureau administratif</h2><p class="intro">Les membres du bureau et leurs responsabilités au sein du Dahira.</p><h3>Membres du bureau</h3><div class="bu-membres">';
+h+=BUREAU_DAHIRA.map(m=>'<div class="bu-m"><div class="bu-ico">'+svg(USER)+'</div><div><b>'+(m.poste?esc(m.poste):'—')+'</b><span class="'+(m.nom?'':'sans-nom')+'">'+(m.nom?esc(m.nom):'— — — —')+'</span>'+(m.pole?'<small>'+esc(m.pole)+'</small>':'')+'</div></div>').join('');
+h+='</div><h3>Pôles administratifs</h3><div class="bu-poles">';
+h+=POLES.map(p=>'<div class="bu-p"><div class="bu-ico">'+svg(p[0])+'</div><div><b>'+p[1]+'</b><span>'+p[2]+'</span></div></div>').join('');
+h+='</div>';
+const s=document.createElement('section');s.id='bureau';s.innerHTML=h;
+const t=document.getElementById('temoignages');
+if(t)t.before(s);else document.body.appendChild(s);
+const g=document.getElementById('galerie');if(g)g.remove();
+const n=document.querySelector('nav a[href="#galerie"]');
+if(n){n.href='#bureau';n.textContent='Bureau';}
+const c=document.querySelector('.dec-carte[href="#galerie"]');
+if(c){c.href='#bureau';c.innerHTML='<b>Bureau administratif</b><span>Membres du bureau et pôles administratifs</span>';}
+})();
+</script>
+
 
 
 
