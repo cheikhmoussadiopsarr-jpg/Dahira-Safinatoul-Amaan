@@ -548,6 +548,96 @@ const bu=document.querySelector('#bureau');
 if(bu)bu.insertAdjacentHTML('beforeend','<h3>Commissions</h3><div class="co-grille">'+COMMISSIONS.map(c=>'<div class="co-c"><b>'+esc(c.nom)+'</b><span>'+esc(c.txt)+'</span><small>Responsable : '+esc(c.resp)+'</small></div>').join('')+'</div>');
 })();
 </script>
+  <style>
+html,body{height:100%;overflow:hidden}
+body{height:100dvh;display:flex;flex-direction:column;transition:background .25s,color .25s}
+nav{position:relative;flex:none}
+nav a.on{border-bottom-color:var(--or)}
+#track{flex:1;min-height:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior:contain}
+#track::-webkit-scrollbar{display:none}
+.panel{flex:0 0 100%;min-width:0;overflow-y:auto;scroll-snap-align:start;scroll-snap-stop:always;-webkit-overflow-scrolling:touch}
+.panel.act>*{animation:monte .35s ease}
+@keyframes monte{from{opacity:.35;transform:translateY(10px)}}
+.haut{display:none!important}
+.theme{margin-left:auto;position:sticky;right:0;flex:none;background:var(--vert);border:0;color:var(--or);padding:0 14px;cursor:pointer;display:grid;place-items:center;box-shadow:-12px 0 10px var(--vert)}
+.theme svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#pole-vue{inset:auto 0 0 0;max-height:82vh;border-radius:22px 22px 0 0;display:block;visibility:hidden;transform:translateY(105%);transition:transform .3s ease,visibility 0s .3s;box-shadow:0 0 0 100vmax rgba(0,0,0,.45)}
+#pole-vue.on{visibility:visible;transform:none;transition:transform .3s ease}
+#pole-vue::before{content:"";display:block;width:44px;height:5px;border-radius:3px;background:#b8c4bd;margin:0 auto 12px}
+[data-theme="dark"]{--fond:#0e1914;--texte:#e6eee9;--carte:#16251e;--vert:#0b2e21;--vert-clair:#2f9a72;color-scheme:dark}
+[data-theme="dark"] :is(.carte,.vide,.al-prochain,.al-search,.al-ligne,.bu-m,.co-c,.pv-m,.al-chip:not(.on)){background:var(--carte)}
+[data-theme="dark"] :is(.al-search,.al-ligne){color:var(--texte)}
+[data-theme="dark"] .al-search{border-color:#2c4a3c}
+[data-theme="dark"] .al-pill{background:#223a30}
+[data-theme="dark"] :is(section h2,#bureau h3,.decouvrir h2,.carte h3,.al-ligne h3,.bu-m b,.co-c b,.pv h2,.pv h4,.pv-m b,.al-contenu h2,.al-pill,.al-chip:not(.on)){color:#e3c274!important}
+[data-theme="dark"] :is(.carte small,.al-ligne small,.bu-m small,.al-contenu p,section .intro){color:#9fb0a7!important}
+</style>
+<script>
+(function(){
+var $=function(s){return document.querySelector(s)};
+var nav=$('nav');if(!nav)return;
+var calme=matchMedia('(prefers-reduced-motion: reduce)').matches;
+var G=[['accueil',['#accueil','.decouvrir','#contact']],['responsables',['#responsables']],['albums',['#albums']],['bureau',['#bureau']],['temoignages',['#temoignages']],['conservatoire',['#conservatoire']],['audios',['#audios']]];
+var track=document.createElement('main');track.id='track';nav.after(track);
+var panels=[];
+G.forEach(function(g){
+  var p=document.createElement('div');p.className='panel';p.dataset.id=g[0];
+  g[1].forEach(function(s){var e=$(s);if(e)p.appendChild(e)});
+  if(p.children.length){track.appendChild(p);panels.push(p)}
+});
+var links=[].slice.call(nav.querySelectorAll('a[href^="#"]'));
+var cur=0;
+function mark(i){
+  var id=panels[i]?'#'+panels[i].dataset.id:'';
+  links.forEach(function(a){
+    var on=a.getAttribute('href')===id;a.classList.toggle('on',on);
+    if(on)nav.scrollTo({left:a.offsetLeft-nav.clientWidth/2+a.offsetWidth/2,behavior:calme?'auto':'smooth'});
+  });
+}
+function go(i,bas){
+  var p=panels[i];if(!p)return;
+  track.scrollTo({left:i*track.clientWidth,behavior:calme?'auto':'smooth'});
+  p.scrollTo({top:bas?p.scrollHeight:0});
+}
+var raf=0;
+track.addEventListener('scroll',function(){
+  if(raf)return;
+  raf=requestAnimationFrame(function(){
+    raf=0;var i=Math.round(track.scrollLeft/track.clientWidth);
+    if(i===cur||!panels[i])return;
+    cur=i;panels.forEach(function(p,k){p.classList.toggle('act',k===i)});mark(i);
+  });
+});
+addEventListener('resize',function(){track.scrollTo({left:cur*track.clientWidth})});
+document.addEventListener('click',function(e){
+  var a=e.target.closest('a[href^="#"]');if(!a)return;
+  var id=a.getAttribute('href').slice(1);if(!id)return;
+  var el=document.getElementById(id);if(!el)return;
+  var p=el.closest('.panel');if(!p)return;
+  e.preventDefault();go(panels.indexOf(p),id==='contact');
+});
+mark(0);
+
+/* Bouton soleil / lune */
+var K='dahira-theme',r=document.documentElement;
+var MOON='<svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+var SUN='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+var btn=document.createElement('button');btn.className='theme';nav.appendChild(btn);
+function lire(){try{return localStorage.getItem(K)}catch(e){return null}}
+function ecrire(v){try{localStorage.setItem(K,v)}catch(e){}}
+function appliquer(t){r.setAttribute('data-theme',t);btn.innerHTML=t==='dark'?SUN:MOON;btn.setAttribute('aria-label',t==='dark'?'Mode clair':'Mode sombre')}
+appliquer(lire()||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+btn.addEventListener('click',function(){var t=r.getAttribute('data-theme')==='dark'?'light':'dark';appliquer(t);ecrire(t)});
+
+/* Fermer la fiche d'un pôle en touchant à côté */
+var sheet=document.getElementById('pole-vue');
+if(sheet)document.addEventListener('click',function(e){
+  if(sheet.classList.contains('on')&&!e.target.closest('#pole-vue,.bu-p')){sheet.classList.remove('on');e.stopPropagation();e.preventDefault();}
+},true);
+})();
+</script>
+
+  
 
 
 
