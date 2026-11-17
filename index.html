@@ -827,6 +827,114 @@ new MutationObserver(sync).observe(r,{attributes:true,attributeFilter:['data-the
 sync();
 })();
 </script>
+  <style>
+#fk-vue{position:fixed;inset:0;z-index:96;background:var(--fond);overflow-y:auto;display:none;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(40px + env(safe-area-inset-bottom,0px))}
+#fk-vue.on{display:block}
+#fk-vue.on .al-contenu{animation:fkf .6s ease-out}
+@keyframes fkf{from{opacity:0}}
+#fk-vue h2{color:var(--vert);font-size:1.9rem;margin-bottom:6px}
+.fk-sub{color:#667;margin-bottom:14px}
+.fk-note{background:#fff;border-left:4px solid var(--or);border-radius:8px;padding:10px 14px;margin-bottom:16px}
+[data-theme="dark"] .fk-note{background:var(--carte)}
+[data-theme="dark"] .fk-sub{color:#9fb0a7}
+</style>
+<script>
+/* ========== FULK : ajoute les photos et vidéos de chaque année ==========
+   Photo  : { src:"nom-exact.jpg.JPG", titre:"Légende" }
+   Vidéo  : { titre:"Titre", url:"https://www.youtube.com/watch?v=XXXXXXXXXXX" }
+   Exemple : photos:[ { src:"fulk1.jpg.JPG", titre:"Iftar" }, { src:"fulk2.jpg.JPG", titre:"" } ]
+   resume (facultatif) : une courte phrase sur l'année.
+   Nouvelle année : copie une ligne, colle-la dessous, change le chiffre.
+*/
+const FULK_ANNEES = {
+  "2022": { resume:"", couverture:"", photos:[], videos:[] },
+  "2023": { resume:"", couverture:"", photos:[], videos:[] },
+  "2024": { resume:"", couverture:"", photos:[], videos:[] },
+  "2025": { resume:"", couverture:"", photos:[], videos:[] },
+  "2026": { resume:"", couverture:"", photos:[], videos:[] }
+};
+/* ========== DAHIRA JOKKO FULK : un bloc par premier jeudi du mois ==========
+   Exemple : { date:"2026-12-03", photos:[ {src:"jokko1.jpg.JPG",titre:""} ], videos:[] },
+*/
+const JOKKO_FULK = [
+];
+/* ========== FIN DE LA ZONE FULK : ne touche pas en dessous ========== */
+
+(function(){
+var $=function(i){return document.getElementById(i)};
+var esc=function(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var cats=$('al-cats');if(!cats)return;
+var D=function(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2])};
+var fr=function(d,o){return d.toLocaleDateString('fr-FR',o)};
+var longue=function(d){return fr(d,{weekday:'long',day:'numeric',month:'long',year:'numeric'})};
+var nP=function(o){return (o.photos||[]).length},nV=function(o){return (o.videos||[]).length};
+var ANS=Object.keys(FULK_ANNEES).sort(function(a,b){return b-a});
+var JOK=JOKKO_FULK.slice().sort(function(a,b){return b.date.localeCompare(a.date)});
+var tot=ANS.reduce(function(s,y){return s+nP(FULK_ANNEES[y])+nV(FULK_ANNEES[y])},0);
+var lect=function(url){var m=url.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/);return m?'<iframe src="https://www.youtube-nocookie.com/embed/'+m[1]+'" loading="lazy" allowfullscreen title="Vidéo"></iframe>':'<video src="'+esc(url)+'" controls preload="none"></video>'};
+
+/* Prochain premier jeudi du mois */
+var d0=new Date();d0.setHours(0,0,0,0);
+for(var i=0;i<70;i++){if(d0.getDay()===4&&d0.getDate()<=7)break;d0.setDate(d0.getDate()+1)}
+var pjt=fr(d0,{weekday:'long',day:'numeric',month:'long'});
+var bn=$('al-proch');if(bn)bn.innerHTML+='<br>Prochain Dahira Jokko Fulk : <b>'+pjt+'</b>';
+
+/* Les deux cartes dans Albums */
+var g=document.createElement('div');g.className='al-cats';g.id='fk-cats';
+g.innerHTML='<button class="al-cat" data-fk-open="fulk"><span class="al-ico">F</span><span><b>FULK</b><small>'+ANS.length+' année(s), '+tot+' élément(s)</small></span></button>'
+ +'<button class="al-cat" data-fk-open="jokko"><span class="al-ico">JF</span><span><b>Dahira Jokko Fulk</b><small>Premier jeudi du mois</small></span></button>';
+cats.after(g);
+
+/* Fenêtre plein écran */
+var vue=document.createElement('div');vue.id='fk-vue';document.body.appendChild(vue);
+var etat='liste',cur=null;
+function montrer(h){vue.innerHTML='<div class="al-contenu">'+h+'</div>';vue.classList.add('on');vue.scrollTop=0}
+var BACK='<button class="al-retour" data-fk-back>Retour</button>';
+function listeFulk(){
+  etat='liste';
+  montrer(BACK+'<h2>FULK</h2><p class="fk-sub">Rencontre qui se tient tout au long du mois de Ramadan, depuis 2022. Le Dahira y participe.</p><div class="al-liste">'
+   +ANS.map(function(y){var o=FULK_ANNEES[y];
+     var c=o.couverture?'<img class="al-couv" src="'+esc(o.couverture)+'" alt="" loading="lazy">':'<div class="al-couv"><div><b>'+y+'</b><span>FULK</span></div></div>';
+     return '<button class="al-ligne" data-fk-year="'+y+'">'+c+'<span><h3>FULK '+y+'</h3><small>'+(o.resume?esc(o.resume):'Photos et vidéos')+'</small><span class="al-pill">'+nP(o)+' photo(s), '+nV(o)+' vidéo(s)</span></span></button>'}).join('')+'</div>');
+}
+function listeJokko(){
+  etat='liste';
+  var h=BACK+'<h2>Dahira Jokko Fulk</h2><p class="fk-sub">Rassemblement chaque premier jeudi du mois pour préparer le Ramadan.</p><div class="fk-note">Prochain rendez-vous : <b>'+pjt+'</b></div>';
+  h+=JOK.length?'<div class="al-liste">'+JOK.map(function(a,i){var d=D(a.date);
+    var c=a.couverture?'<img class="al-couv" src="'+esc(a.couverture)+'" alt="" loading="lazy">':'<div class="al-couv"><div><b>'+d.getDate()+'</b><span>'+fr(d,{month:'short',year:'numeric'})+'</span></div></div>';
+    return '<button class="al-ligne" data-fk-jokko="'+i+'">'+c+'<span><h3>Dahira Jokko Fulk</h3><small>'+esc(longue(d))+'</small><span class="al-pill">'+nP(a)+' photo(s), '+nV(a)+' vidéo(s)</span></span></button>'}).join('')+'</div>'
+   :'<div class="vide">Les albums des premiers jeudis arrivent bientôt.</div>';
+  montrer(h);
+}
+function item(tab){
+  etat='item';var o=cur.o;
+  var T=[['photos','Photos'],['videos','Vidéos']].filter(function(t){return (o[t[0]]||[]).length});
+  tab=tab||(T[0]&&T[0][0]);
+  var h=BACK+'<h2>'+esc(cur.titre)+'</h2><p class="fk-sub">'+esc(cur.sous)+'</p>';
+  if(T.length)h+='<div class="al-annees">'+T.map(function(t){return '<button class="al-chip '+(t[0]===tab?'on':'')+'" data-fk-tab="'+t[0]+'">'+t[1]+' ('+o[t[0]].length+')</button>'}).join('')+'</div>';
+  if(tab==='photos')h+='<div class="galerie">'+o.photos.map(function(p,k){return '<button data-fk-photo="'+k+'"><img src="'+esc(p.src)+'" alt="'+esc(p.titre||'')+'" loading="lazy"></button>'}).join('')+'</div>';
+  if(tab==='videos')h+='<div class="grille" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">'+o.videos.map(function(v){return '<div class="carte"><div class="video">'+lect(v.url)+'</div><div class="info"><h3>'+esc(v.titre||'')+'</h3></div></div>'}).join('')+'</div>';
+  if(!T.length)h+='<div class="vide">Les photos et vidéos seront bientôt disponibles.</div>';
+  montrer(h);
+}
+function retour(){
+  if(etat==='item'&&cur){cur.retour==='jokko'?listeJokko():listeFulk()}
+  else vue.classList.remove('on');
+}
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-fk-open],[data-fk-back],[data-fk-year],[data-fk-jokko],[data-fk-tab],[data-fk-photo]');if(!t)return;
+  var a=function(n){return t.getAttribute(n)};
+  if(t.hasAttribute('data-fk-open')){a('data-fk-open')==='jokko'?listeJokko():listeFulk()}
+  else if(t.hasAttribute('data-fk-back'))retour();
+  else if(t.hasAttribute('data-fk-year')){var y=a('data-fk-year'),o=FULK_ANNEES[y];cur={titre:'FULK '+y,sous:o.resume||'Rencontre du mois de Ramadan',o:o,retour:'fulk'};item()}
+  else if(t.hasAttribute('data-fk-jokko')){var j=JOK[+a('data-fk-jokko')];cur={titre:'Dahira Jokko Fulk',sous:longue(D(j.date)),o:j,retour:'jokko'};item()}
+  else if(t.hasAttribute('data-fk-tab'))item(a('data-fk-tab'));
+  else if(t.hasAttribute('data-fk-photo')){var p=cur.o.photos[+a('data-fk-photo')];$('lb-img').src=p.src;$('lb-txt').textContent=p.titre||'';$('lightbox').classList.add('ouvert')}
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')vue.classList.remove('on')});
+})();
+</script>
+
   
 </body>
 </html>
