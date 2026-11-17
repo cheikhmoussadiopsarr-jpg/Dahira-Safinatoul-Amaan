@@ -1110,6 +1110,166 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .st-s{background:linear-gradient(135deg,#0b2e21,#14402f)}
 .st-s img{width:100%;height:100%;object-fit:contain!important}
 </style>
+  <style>
+.st-s img[src$="Stories.jpg.jpg"]{object-fit:cover!important;object-position:center 30%}
+
+#calendrier{--titre:var(--vert)}
+[data-theme="dark"] #calendrier{--titre:#e3c274}
+#calendrier h3{font-family:var(--police-titre);font-size:1.35rem;color:var(--titre);margin:26px 0 12px}
+.cal-hero{background:linear-gradient(135deg,var(--vert),#14402f);color:#fff;border-radius:18px;padding:20px 18px;border-left:5px solid var(--or);box-shadow:0 4px 16px rgba(0,0,0,.12)}
+.cal-hero small{display:block;letter-spacing:.08em;text-transform:uppercase;font-size:.72rem;color:var(--or);margin-bottom:6px}
+.cal-hero h4{font-family:var(--police-titre);font-size:1.7rem;line-height:1.15}
+.cal-hero p{opacity:.92;margin-top:4px}
+.cal-count{display:inline-block;margin-top:12px;background:var(--or);color:var(--vert);font-weight:700;border-radius:999px;padding:6px 16px}
+.cal-liste{display:grid;gap:10px}
+.cal-item{display:flex;gap:14px;align-items:center;background:var(--carte,#fff);border-radius:14px;padding:10px 12px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.cal-date{flex:none;width:58px;height:62px;border-radius:12px;background:var(--vert);color:#fff;display:grid;place-items:center;text-align:center;line-height:1.05}
+.cal-date b{font-family:var(--police-titre);font-size:1.6rem;color:var(--or);display:block}
+.cal-date span{font-size:.7rem;text-transform:uppercase}
+.cal-item h5{font-family:var(--police-titre);font-size:1.15rem;color:var(--titre)}
+.cal-item small{display:block;color:#667;font-size:.82rem}
+.cal-tag{display:inline-block;font-size:.7rem;border-radius:999px;padding:1px 9px;margin:4px 6px 0 0;background:#e8efe9;color:var(--vert)}
+.cal-tag.mouride{background:var(--or);color:var(--vert);font-weight:700}
+.cal-tag.est{background:transparent;border:1px dashed #9aa7a0;color:#667}
+.cal-plus{margin-top:12px}
+.cal-mois-tete{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px}
+.cal-mois-tete span{font-size:.85rem;color:#667}
+.cal-grille{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:10px}
+.cal-j{text-align:center;font-size:.72rem;color:#667;padding:2px 0}
+.cal-c{position:relative;aspect-ratio:1/1.05;background:var(--carte,#fff);border-radius:10px;display:grid;place-content:center;text-align:center;line-height:1.1;box-shadow:0 1px 5px rgba(0,0,0,.06)}
+.cal-c b{font-size:1rem;color:var(--texte)}
+.cal-c i{font-style:normal;font-size:.68rem;color:var(--vert-clair)}
+.cal-c.vide{background:none;box-shadow:none}
+.cal-c.auj{background:var(--vert)}
+.cal-c.auj b{color:#fff}
+.cal-c.auj i{color:var(--or)}
+.cal-c.ev::after{content:"";position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--or)}
+.cal-note{font-size:.82rem;color:#667;margin-top:10px;line-height:1.4}
+.cal-note.lune{background:var(--carte,#fff);border-left:4px solid var(--or);border-radius:8px;padding:10px 12px;color:var(--texte)}
+[data-theme="dark"] .cal-item small,[data-theme="dark"] .cal-j,[data-theme="dark"] .cal-note,[data-theme="dark"] .cal-mois-tete span{color:#9fb0a7}
+[data-theme="dark"] .cal-note.lune{color:var(--texte)}
+[data-theme="dark"] .cal-tag{background:#223a30;color:#cfe0d6}
+[data-theme="dark"] .cal-tag.mouride{background:var(--or);color:#0b2e21}
+[data-theme="dark"] .cal-tag.est{background:transparent;color:#9fb0a7;border-color:#5a6f64}
+[data-theme="dark"] .cal-c.auj{background:#1d6b4f}
+#track .panel.doux .cal-item{animation:douce var(--duree,1.2s) ease-out backwards;animation-delay:calc(var(--i,0)*90ms)}
+</style>
+<script>
+/* ========== CALENDRIER : à mettre à jour chaque mois ==========
+   Quand la lune est observée, ajoute le mois suivant avec confirme:true.
+   debut : date grégorienne du 1er jour du mois (AAAA-MM-JJ)
+   jours : 29 ou 30        mois : numéro (1 = Mouharram ... 12 = Dhul Hijja)
+   Si la lune décale d'un jour, change simplement "debut".
+*/
+const MOIS_HEGIRE = [
+  { annee:1448, mois:6, debut:"2026-11-11", jours:29, confirme:true },
+  { annee:1448, mois:7, debut:"2026-12-10", jours:30, confirme:false }
+];
+/* Événements ajoutés à la main (Magal de Porokhane, Darou Mouhty, etc.)
+   Exemple : { nom:"Magal de Porokhane", date:"2027-01-28", type:"mouride", txt:"Sokhna Mame Diarra Bousso" },
+*/
+const EVENEMENTS_PERSO = [
+];
+/* ========== FIN DE LA ZONE CALENDRIER ========== */
+
+(function(){
+var track=document.getElementById('track');if(!track)return;
+var NOMS=['','Mouharram','Safar',"Rabi'ul Awwal","Rabi'ul Thani",'Dioumada Awwal','Dioumada Saani','Rajab','Chaabane','Ramadan','Chawwal','Dhul Qihda','Dhul Hijja'];
+var EV=[
+ {nom:'Début de Ramadan',m:9,j:1,type:'religieux'},
+ {nom:'Laylatoul Qadr',m:9,j:27,type:'mouride',txt:'Nuit du destin'},
+ {nom:'Korité',m:10,j:1,type:'religieux',txt:'Fin du Ramadan'},
+ {nom:'Tabaski',m:12,j:10,type:'religieux'},
+ {nom:'Nouvel an musulman',m:1,j:1,type:'religieux'},
+ {nom:'Tamkharit',m:1,j:10,type:'religieux',txt:'Achoura'},
+ {nom:'Grand Magal de Touba',m:2,j:18,type:'mouride',txt:"Départ en exil de Cheikh Ahmadou Bamba"},
+ {nom:'Gamou',m:3,j:12,type:'mouride',txt:'Naissance du Prophète (Mawlid)'},
+ {nom:'Kazu Rajab',m:7,j:27,type:'mouride',txt:'Naissance de Serigne Fallou Mbacké'}
+];
+var DAY=864e5,now=new Date(),T=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());
+var esc=function(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var P=function(s){var a=s.split('-');return Date.UTC(+a[0],+a[1]-1,+a[2])};
+var fr=function(ms,o){o.timeZone='UTC';return new Date(ms).toLocaleDateString('fr-FR',o)};
+var fmt=null;try{fmt=new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{day:'numeric',month:'numeric',year:'numeric',timeZone:'UTC'})}catch(e){}
+function intl(ms){
+  if(!fmt)return null;
+  try{var o={};fmt.formatToParts(new Date(ms)).forEach(function(p){o[p.type]=p.value});
+    var y=parseInt(o.year,10),m=parseInt(o.month,10),d=parseInt(o.day,10);
+    return(y&&m&&d)?{y:y,m:m,d:d}:null}catch(e){return null}
+}
+function hij(ms){
+  for(var i=0;i<MOIS_HEGIRE.length;i++){
+    var a=MOIS_HEGIRE[i],n=Math.round((ms-P(a.debut))/DAY);
+    if(n>=0&&n<(a.jours||30))return{y:a.annee,m:a.mois,d:n+1,ok:!!a.confirme};
+  }
+  var x=intl(ms);return x?{y:x.y,m:x.m,d:x.d,ok:false}:null;
+}
+var lab=function(h){return h?h.d+' '+NOMS[h.m]+' '+h.y:''};
+var dans=function(ms){var n=Math.round((ms-T)/DAY);return n<=0?"Aujourd'hui":n===1?'Demain':'Dans '+n+' jours'};
+
+/* Événements à venir */
+var list=[];
+EV.forEach(function(e){
+  for(var i=0;i<=400;i++){var ms=T+i*DAY,h=hij(ms);
+    if(h&&h.m===e.m&&h.d===e.j){list.push({nom:e.nom,txt:e.txt,type:e.type,ms:ms,h:h,ok:h.ok});break}}
+});
+EVENEMENTS_PERSO.forEach(function(e){var ms=P(e.date);if(ms>=T)list.push({nom:e.nom,txt:e.txt||'',type:e.type||'religieux',ms:ms,h:hij(ms),ok:true})});
+list.sort(function(a,b){return a.ms-b.ms});
+
+/* Page */
+var h0=hij(T),h='<div class="trait"></div><h2>Calendrier musulman</h2><p class="intro">Les prochaines dates religieuses de la confrérie mouride.</p>';
+if(!h0||!list.length){h+='<div class="vide">Le calendrier sera bientôt disponible.</div>'}
+else{
+  var f=list[0];
+  h+='<div class="cal-hero"><small>Prochain événement</small><h4>'+esc(f.nom)+'</h4><p>'+esc(fr(f.ms,{weekday:'long',day:'numeric',month:'long',year:'numeric'}))+(f.h?' · '+esc(lab(f.h)):'')+'</p>'+(f.txt?'<p>'+esc(f.txt)+'</p>':'')+'<span class="cal-count">'+dans(f.ms)+'</span>'+(f.ok?'':'<p style="font-size:.8rem;opacity:.8;margin-top:8px">Date estimée, à confirmer avec l\'observation de la lune.</p>')+'</div>';
+  h+='<h3>À venir</h3><div class="al-annees"><button class="al-chip on" data-f="tous">Tous</button><button class="al-chip" data-f="mouride">Mouride</button></div><div class="cal-liste" id="cal-liste"></div><button class="al-chip cal-plus" id="cal-plus" data-plus="1">Voir plus</button>';
+  var st=T-(h0.d-1)*DAY,cnt=0;
+  for(var i=0;i<32;i++){var hh=hij(st+i*DAY);if(hh&&hh.m===h0.m)cnt++;else break}
+  var last=st+(cnt-1)*DAY,wd=(new Date(st).getUTCDay()+6)%7;
+  h+='<h3>Mois en cours</h3><div class="cal-mois-tete"><b style="font-family:var(--police-titre);font-size:1.2rem;color:var(--titre)">'+esc(NOMS[h0.m])+' '+h0.y+'</b><span>'+(h0.m===1?'1er':h0.m+'e')+' mois</span></div>';
+  h+='<p class="cal-note" style="margin-top:2px">Du '+esc(fr(st,{weekday:'long',day:'numeric',month:'long'}))+' au '+esc(fr(last,{weekday:'long',day:'numeric',month:'long',year:'numeric'}))+'</p>';
+  h+='<div class="cal-grille">'+['L','M','M','J','V','S','D'].map(function(x){return '<div class="cal-j">'+x+'</div>'}).join('');
+  for(var k=0;k<wd;k++)h+='<div class="cal-c vide"></div>';
+  for(var d=0;d<cnt;d++){var ms=st+d*DAY,ev=list.some(function(e){return e.ms===ms});
+    h+='<div class="cal-c'+(ms===T?' auj':'')+(ev?' ev':'')+'"><b>'+new Date(ms).getUTCDate()+'</b><i>'+(d+1)+'</i></div>'}
+  h+='</div><p class="cal-note">Grand chiffre : jour du mois. Petit chiffre : jour du mois hégirien. Point doré : événement.</p>';
+  var nx=hij(st+cnt*DAY);
+  if(!nx||!nx.ok)h+='<p class="cal-note lune">Scrutement de la lune (Sèntou Wéer) : le début du mois suivant dépend de l\'observation du croissant, le soir du '+esc(fr(last,{weekday:'long',day:'numeric',month:'long'}))+'.</p>';
+  h+='<p class="cal-note">Dates selon l\'observation locale de la lune : elles peuvent varier d\'un jour. « Date estimée » signifie non encore confirmée.</p>';
+}
+var sec=document.createElement('section');sec.id='calendrier';sec.innerHTML=h;
+var panel=document.createElement('div');panel.className='panel';panel.dataset.id='calendrier';panel.appendChild(sec);
+var al=track.querySelector('.panel[data-id="albums"]');
+if(al)al.after(panel);else track.appendChild(panel);
+
+/* Menu et carte d'accueil */
+var nav=document.querySelector('nav');
+if(nav){var lk=document.createElement('a');lk.href='#calendrier';lk.textContent='Calendrier';var la=nav.querySelector('a[href="#albums"]');if(la)la.after(lk);else nav.insertBefore(lk,nav.querySelector('.theme'))}
+var dg=document.querySelector('.dec-grille');
+if(dg){var card='<a class="dec-carte" href="#calendrier"><b>Calendrier</b><span>Prochaines dates religieuses</span></a>',ca=dg.querySelector('a[href="#albums"]');
+  if(ca)ca.insertAdjacentHTML('afterend',card);else dg.insertAdjacentHTML('beforeend',card);
+  [].forEach.call(dg.children,function(c,i){c.style.setProperty('--i',i)})}
+
+/* Liste filtrable */
+var liste=document.getElementById('cal-liste');if(!liste)return;
+var filtre='tous',plus=false;
+function rend(){
+  var l=list.filter(function(e){return e!==list[0]&&(filtre==='tous'||e.type==='mouride')});
+  var vis=plus?l:l.slice(0,5);
+  liste.innerHTML=vis.length?vis.map(function(e,i){
+    return '<div class="cal-item" style="--i:'+Math.min(i,8)+'"><div class="cal-date"><div><b>'+new Date(e.ms).getUTCDate()+'</b><span>'+esc(fr(e.ms,{month:'short'}))+'</span></div></div><div><h5>'+esc(e.nom)+'</h5><small>'+esc(fr(e.ms,{weekday:'long',day:'numeric',month:'long',year:'numeric'}))+(e.h?' · '+esc(lab(e.h)):'')+'</small><span class="cal-tag '+(e.type==='mouride'?'mouride':'')+'">'+(e.type==='mouride'?'Mouride':'Religieux')+'</span><span class="cal-tag">'+dans(e.ms)+'</span>'+(e.ok?'':'<span class="cal-tag est">Date estimée</span>')+'</div></div>'}).join(''):'<div class="vide">Aucun événement à venir.</div>';
+  var b=document.getElementById('cal-plus');b.style.display=l.length>5?'':'none';b.textContent=plus?'Voir moins':'Voir plus';
+  [].forEach.call(sec.querySelectorAll('[data-f]'),function(c){c.classList.toggle('on',c.getAttribute('data-f')===filtre)});
+}
+sec.addEventListener('click',function(e){
+  var b=e.target.closest('[data-f],[data-plus]');if(!b)return;
+  if(b.hasAttribute('data-f'))filtre=b.getAttribute('data-f');else plus=!plus;
+  rend();
+});
+rend();
+})();
+</script>
+
 
 
 
