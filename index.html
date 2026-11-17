@@ -934,6 +934,141 @@ document.addEventListener('click',function(e){
 document.addEventListener('keydown',function(e){if(e.key==='Escape')vue.classList.remove('on')});
 })();
 </script>
+  <style>
+.hero.stories-on{padding:0;background:none!important;background-image:none!important}
+.hero.stories-on::before,.hero.stories-on::after{display:none!important}
+.st{position:relative;width:100%;height:min(72vh,600px);min-height:340px;background:#0b2e21;overflow:hidden;cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.st-s{position:absolute;inset:0;opacity:0;transition:opacity .9s ease}
+.st-s.on{opacity:1}
+.st-s img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-drag:none}
+.st::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,rgba(8,40,30,.55),transparent 22%,transparent 70%,rgba(8,40,30,.5))}
+.st-bars{position:absolute;top:10px;left:12px;right:12px;z-index:3;display:flex;gap:5px}
+.st-b{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.35);overflow:hidden}
+.st-b i{display:block;height:100%;width:0;background:#fff}
+.st-b.done i{width:100%}
+.st-b.on i{animation:stfill var(--st-dur,8s) linear forwards}
+@keyframes stfill{from{width:0}to{width:100%}}
+.st.pause .st-b.on i,.st.off .st-b.on i{animation-play-state:paused}
+.st-vide{position:absolute;inset:0;display:grid;place-content:center;gap:8px;text-align:center;color:#fff;padding:20px}
+@media(min-width:900px){.st{max-width:560px;margin:16px auto;border-radius:18px}}
+.reseaux{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:18px}
+.rs{display:inline-flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-size:.95rem;border:1px solid rgba(201,162,75,.55);border-radius:999px;padding:10px 18px;background:rgba(255,255,255,.06);transition:background .5s}
+.rs:hover{background:rgba(201,162,75,.18)}
+.rs svg{flex:none;width:22px;height:22px;color:var(--or);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+</style>
+<script>
+/* ========== STORIES D'ACCUEIL : écris les noms exacts des photos ========== */
+const STORIES_PHOTOS = ["Stories.jpg 2.JPG","Stories.jpg.JPG","Stories.jpg.jpg"];
+const DUREE_STORY = 8; /* secondes par photo */
+/* ========== RÉSEAUX SOCIAUX DU DAHIRA ========== */
+const RESEAUX = [
+  { nom:"Instagram", icone:"insta",  texte:"@dahira_safinatoul_amaan", url:"https://www.instagram.com/dahira_safinatoul_amaan" },
+  { nom:"TikTok",    icone:"tiktok", texte:"@darihasafinatoulamaan07", url:"https://www.tiktok.com/@darihasafinatoulamaan07" }
+];
+/* ========== FIN DE LA ZONE À MODIFIER ========== */
+
+(function(){
+var esc=function(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var calme=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* 1) Stories */
+var h=document.querySelector('.hero');
+if(h){
+  h.classList.add('stories-on');h.innerHTML='';
+  var st=document.createElement('div');st.className='st';st.style.setProperty('--st-dur',DUREE_STORY+'s');
+  st.setAttribute('role','button');st.tabIndex=0;st.setAttribute('aria-label','Diaporama du Dahira, toucher pour la photo suivante');
+  h.appendChild(st);
+  Promise.all(STORIES_PHOTOS.map(function(f){return new Promise(function(res){
+    var im=new Image(),u=encodeURI(f);im.onload=function(){res(u)};im.onerror=function(){res(null)};im.src=u;
+  })})).then(function(arr){
+    var src=arr.filter(Boolean),N=src.length;
+    if(!N){st.innerHTML='<div class="st-vide"><div style="color:var(--or);font-size:1.5rem">سفينة الأمان</div><h1 style="font-size:clamp(2rem,8vw,3.4rem)">Dahira Safinatoul Amaan</h1></div>';return}
+    st.innerHTML='<div class="st-bars">'+src.map(function(){return '<span class="st-b"><i></i></span>'}).join('')+'</div>'
+      +src.map(function(s){return '<div class="st-s"><img src="'+s+'" alt="Photo du Dahira" decoding="async"></div>'}).join('');
+    var slides=st.querySelectorAll('.st-s'),bars=st.querySelectorAll('.st-b'),idx=0,t0=0;
+    function show(n){
+      idx=(n+N)%N;
+      [].forEach.call(slides,function(s,k){s.classList.toggle('on',k===idx)});
+      [].forEach.call(bars,function(b,k){
+        b.classList.remove('on','done');void b.offsetWidth;
+        if(k<idx)b.classList.add('done');else if(k===idx)b.classList.add('on');
+      });
+    }
+    function next(){show(idx+1)}
+    st.addEventListener('animationend',function(e){if(e.animationName==='stfill')next()});
+    st.addEventListener('pointerdown',function(){t0=Date.now();st.classList.add('pause')});
+    st.addEventListener('pointerup',function(){st.classList.remove('pause');if(Date.now()-t0<300)next()});
+    st.addEventListener('pointercancel',function(){st.classList.remove('pause')});
+    st.addEventListener('pointerleave',function(){st.classList.remove('pause')});
+    st.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();next()}});
+    if('IntersectionObserver' in window)new IntersectionObserver(function(en){st.classList.toggle('off',!en[0].isIntersecting)},{threshold:.4}).observe(st);
+    show(0);
+  });
+}
+
+/* 2) Nouvel ordre : menu, pages et cartes */
+var oldT=document.getElementById('track'),nav=document.querySelector('nav');
+if(oldT&&nav){
+  var by={};[].forEach.call(oldT.children,function(p){by[p.dataset.id]=p});
+  var t=document.createElement('main');t.id='track';
+  ['accueil','responsables','bureau','membres','albums','temoignages','conservatoire'].forEach(function(id){if(by[id]){t.appendChild(by[id]);delete by[id]}});
+  Object.keys(by).forEach(function(id){t.appendChild(by[id])});
+  oldT.replaceWith(t);
+  var ref=nav.querySelector('.theme')||null;
+  ['#accueil','#responsables','#bureau','#membres','#albums','#temoignages','#conservatoire','#contact'].forEach(function(x){
+    var a=nav.querySelector('a[href="'+x+'"]');if(a)nav.insertBefore(a,ref);
+  });
+  var dg=document.querySelector('.dec-grille');
+  if(dg){
+    ['responsables','bureau','membres','albums','temoignages','conservatoire'].forEach(function(id){var c=dg.querySelector('a[href="#'+id+'"]');if(c)dg.appendChild(c)});
+    [].forEach.call(dg.children,function(c,i){c.style.setProperty('--i',i)});
+  }
+  var cur=0,raf=0;
+  var go=function(i,bas){
+    var p=t.children[i];if(!p)return;
+    t.scrollTo({left:i*t.clientWidth,behavior:calme?'auto':'smooth'});
+    p.scrollTo({top:bas?p.scrollHeight:0});
+  };
+  var maj=function(i){
+    var p=t.children[i];if(!p)return;
+    var id='#'+p.dataset.id;
+    [].forEach.call(nav.querySelectorAll('a[href^="#"]'),function(a){
+      var on=a.getAttribute('href')===id;a.classList.toggle('on',on);
+      if(on)nav.scrollTo({left:a.offsetLeft-nav.clientWidth/2+a.offsetWidth/2,behavior:calme?'auto':'smooth'});
+    });
+    [].forEach.call(t.children,function(q){q.classList.remove('doux')});
+    p.classList.add('doux');setTimeout(function(){p.classList.remove('doux')},4000);
+  };
+  t.addEventListener('scroll',function(){
+    if(raf)return;
+    raf=requestAnimationFrame(function(){raf=0;var i=Math.round(t.scrollLeft/t.clientWidth);if(i===cur||!t.children[i])return;cur=i;maj(i)});
+  });
+  addEventListener('resize',function(){t.scrollTo({left:cur*t.clientWidth})});
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('a[href^="#"]');if(!a)return;
+    var id=a.getAttribute('href').slice(1);if(!id)return;
+    var el=document.getElementById(id);if(!el)return;
+    var p=el.closest('.panel');if(!p)return;
+    e.preventDefault();e.stopPropagation();
+    go([].indexOf.call(t.children,p),id==='contact');
+  },true);
+  maj(0);
+}
+
+/* 3) Réseaux sociaux dans Contact */
+var SVG={
+  insta:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8"/></svg>',
+  tiktok:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3v10.5a4.5 4.5 0 1 1-4.5-4.5"/><path d="M15 3c.4 2.6 2.1 4.2 5 4.5"/></svg>'
+};
+var zc=document.getElementById('zone-contact');
+if(zc){
+  var rs=document.createElement('div');rs.className='reseaux';
+  rs.innerHTML=RESEAUX.map(function(r){return '<a class="rs" href="'+esc(r.url)+'" target="_blank" rel="noopener" aria-label="'+esc(r.nom)+'">'+(SVG[r.icone]||'')+'<span>'+esc(r.texte)+'</span></a>'}).join('');
+  zc.after(rs);
+}
+})();
+</script>
+
 
   
 </body>
