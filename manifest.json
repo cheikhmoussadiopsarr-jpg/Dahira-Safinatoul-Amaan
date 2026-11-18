@@ -1,0 +1,14 @@
+{
+  "name": "Dahira Safinatoul Amaan",
+  "short_name": "Dahira",
+  "description": "Dahira mouride de Guédiawaye : responsables, albums, vidéos, Fulk, calendrier et outils.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "lang": "fr",
+  "background_color": "#0e3b2c",
+  "theme_color": "#0e3b2c",
+  "icons": [
+    { "src": "icone.png.PNG.JPG", "sizes": "any" }
+  ]
+}
