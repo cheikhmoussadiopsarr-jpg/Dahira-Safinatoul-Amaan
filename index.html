@@ -1508,6 +1508,392 @@ if('IntersectionObserver' in window){
 }else on();
 })();
 </script>
+  <style>
+#outils,#ou-vue,#rech-vue{--titre:var(--vert)}
+[data-theme="dark"] #outils,[data-theme="dark"] #ou-vue,[data-theme="dark"] #rech-vue{--titre:#e3c274}
+.ou-grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:6px}
+.ou-t{display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:var(--vert);color:#fff;border:0;border-left:5px solid var(--or);border-radius:14px;padding:14px;text-align:left;font:inherit;cursor:pointer;transition:transform .5s ease}
+.ou-t svg{width:26px;height:26px;fill:none;stroke:var(--or);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ou-t b{font-family:var(--police-titre);font-size:1.15rem;line-height:1.15}
+.ou-t span{font-size:.8rem;opacity:.85;line-height:1.3}
+.ou-t:active{transform:scale(.98)}
+.rech-bar{display:flex;align-items:center;gap:10px;width:100%;margin:0 0 14px;padding:13px 16px;border:1px solid #c9d3cd;border-radius:14px;background:var(--carte,#fff);color:#667;font:inherit;text-align:left;cursor:pointer}
+.rech-bar svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.rech-ico{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid rgba(201,162,75,.6);background:transparent;color:var(--or);display:grid;place-items:center;cursor:pointer;padding:0}
+.rech-ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+[data-theme="dark"] .rech-bar{color:#9fb0a7;border-color:#2c4a3c}
+
+#ou-vue,#rech-vue{position:fixed;inset:0;background:var(--fond);overflow-y:auto;display:none}
+#ou-vue{z-index:97;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(40px + env(safe-area-inset-bottom,0px))}
+#rech-vue{z-index:105;padding:calc(12px + env(safe-area-inset-top,0px)) 16px calc(40px + env(safe-area-inset-bottom,0px))}
+#ou-vue.on,#rech-vue.on{display:block;animation:ouf .45s ease-out}
+@keyframes ouf{from{opacity:0}}
+.ou-c,.rv{max-width:640px;margin:auto}
+.ou-c h2{font-family:var(--police-titre);color:var(--titre);font-size:1.9rem;margin-bottom:4px}
+.ou-sub{color:#667;margin-bottom:12px}
+.ou-retour{background:var(--vert);color:#fff;border:0;border-radius:999px;padding:10px 20px;font:inherit;font-weight:700;cursor:pointer;margin-bottom:14px}
+.ou-lab{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--vert-clair);font-weight:700;margin:16px 0 6px}
+.ou-note{font-size:.8rem;color:#667;line-height:1.45;margin-top:12px}
+[data-theme="dark"] :is(.ou-sub,.ou-note,.ch-nom,.pr-r small,.th-c small,.rv-r small){color:#9fb0a7}
+
+.ch-ar{font-size:2.1rem;text-align:center;color:var(--titre);min-height:2.7rem;font-family:'Amiri',serif}
+.ch-nom{text-align:center;color:#667;margin-bottom:8px}
+.ch-btn{position:relative;display:grid;place-content:center;text-align:center;margin:6px auto 12px;width:min(270px,72vw);aspect-ratio:1;border-radius:50%;border:0;background:radial-gradient(circle at 50% 35%,#1d6b4f,#0e3b2c 70%);color:#fff;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.22);touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;transition:transform .15s ease}
+.ch-btn:active{transform:scale(.97)}
+.ch-btn svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.ch-btn circle{fill:none;stroke-width:5}
+.ch-fond{stroke:rgba(201,162,75,.25)}
+.ch-prog{stroke:var(--or);stroke-linecap:round;stroke-dasharray:326.73;stroke-dashoffset:326.73;transition:stroke-dashoffset .35s ease}
+.ch-n{position:relative;display:block;font-family:var(--police-titre);font-size:4.2rem;line-height:1;color:#f3dc9a}
+.ch-c{position:relative;display:block;font-size:.85rem;opacity:.85;margin-top:6px}
+.ch-stats{text-align:center;font-size:.9rem}
+.ch-msg{text-align:center;color:var(--vert-clair);font-weight:700;min-height:1.5em;margin-top:6px}
+.ch-act{display:flex;gap:8px;margin-top:14px}
+
+.pr-next{background:linear-gradient(135deg,var(--vert),#14402f);color:#fff;border-left:5px solid var(--or);border-radius:16px;padding:16px;margin:12px 0}
+.pr-next small{display:block;letter-spacing:.08em;text-transform:uppercase;font-size:.7rem;color:var(--or)}
+.pr-next b{font-family:var(--police-titre);font-size:1.7rem;display:block;line-height:1.15}
+.pr-liste{display:grid;gap:8px}
+.pr-r{display:flex;align-items:center;justify-content:space-between;background:var(--carte,#fff);border-radius:12px;padding:11px 14px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.pr-r b{display:block;color:var(--titre)}
+.pr-r small{color:#667}
+.pr-r em{font-style:normal;font-family:var(--police-titre);font-size:1.5rem;color:var(--texte)}
+.pr-r.next{outline:2px solid var(--or)}
+
+.qb{position:relative;width:min(260px,70vw);aspect-ratio:1;margin:26px auto 10px}
+.qb-rose{position:absolute;inset:0;border-radius:50%;border:3px solid var(--or);background:var(--carte,#fff);transition:transform .25s linear,box-shadow .5s,border-color .5s;box-shadow:0 6px 20px rgba(0,0,0,.15)}
+.qb-n{position:absolute;top:6px;left:50%;transform:translateX(-50%);font-weight:700;color:var(--titre)}
+.qb-fl{position:absolute;left:50%;top:8%;width:8px;height:42%;margin-left:-4px;border-radius:4px 4px 0 0;background:linear-gradient(var(--or),var(--vert));transform-origin:50% 100%}
+.qb-fl::before{content:"";position:absolute;top:-12px;left:50%;margin-left:-10px;border:10px solid transparent;border-top:0;border-bottom-color:var(--or)}
+.qb::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px;border-radius:50%;background:var(--vert);border:2px solid var(--or)}
+.qb-haut{position:absolute;left:50%;top:-16px;margin-left:-10px;border:10px solid transparent;border-bottom:0;border-top-color:var(--vert-clair)}
+.qb.ok .qb-rose{border-color:#3fbf7f;box-shadow:0 0 28px rgba(63,191,127,.5)}
+.qb-info{text-align:center}
+
+.th-g{display:grid;gap:10px}
+.th-c{display:flex;align-items:center;gap:12px;background:var(--carte,#fff);border:2px solid transparent;border-radius:14px;padding:14px;text-align:left;font:inherit;color:var(--texte);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.th-c.on{border-color:var(--or)}
+.th-c b{display:block;color:var(--titre)}
+.th-c small{color:#667}
+.th-p{flex:none;width:40px;height:40px;border-radius:50%;border:2px solid var(--or)}
+.th-p.clair{background:#f5f7f4}
+.th-p.sombre{background:#0e1914}
+.th-p.auto{background:linear-gradient(90deg,#f5f7f4 50%,#0e1914 50%)}
+
+.lg-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.lg-a{display:block;text-decoration:none;text-align:center;background:var(--carte,#fff);color:var(--texte);border:1px solid rgba(201,162,75,.6);border-radius:12px;padding:12px 8px;font-weight:600}
+
+.sh-btn{display:flex;align-items:center;justify-content:center;width:100%;margin-bottom:8px;padding:13px;border:0;border-radius:12px;background:var(--vert);color:#fff;font:inherit;font-weight:700;cursor:pointer;text-decoration:none}
+.sh-btn.or{background:var(--or);color:var(--vert)}
+.sh-btn.gris{background:transparent;color:var(--texte);border:1px solid #9aa7a0;font-weight:600}
+.sh-liste{padding-left:20px;line-height:1.7}
+.sh-etat{background:var(--carte,#fff);border-left:4px solid var(--or);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.88rem}
+
+.rv-tete{display:flex;gap:8px;position:sticky;top:0;padding:4px 0 12px;background:var(--fond);z-index:1}
+#rv-q{flex:1;min-width:0;padding:13px 16px;border:1px solid #c9d3cd;border-radius:12px;font:inherit;font-size:16px;background:var(--carte,#fff);color:var(--texte)}
+.rv-x{border:0;border-radius:12px;padding:0 16px;background:var(--vert);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.rv-r{display:block;width:100%;text-align:left;background:var(--carte,#fff);border:0;border-radius:12px;padding:10px 14px;margin-bottom:8px;font:inherit;color:var(--texte);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.rv-r b{display:block;color:var(--titre)}
+.rv-r small{color:#667;display:block}
+.rv-k{float:right;font-size:.68rem;background:#e8efe9;color:var(--vert);border-radius:999px;padding:1px 9px;margin-left:8px}
+.rv-sug{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+[data-theme="dark"] #rv-q{border-color:#2c4a3c}
+[data-theme="dark"] .rv-k{background:#223a30;color:#cfe0d6}
+</style>
+<script>
+/* ========== OUTILS : réglages ==========
+   SITE_URL : adresse du site (pour partager et traduire)
+   OUTILS_LIEU : lieu des heures de prière et de la Qibla
+   AJUSTEMENT_PRIERES : décalage en minutes pour coller aux heures de ta plateforme mouride
+                        (ex. fajr:-2 enlève 2 minutes, isha:+1 en ajoute 1)
+   LANGUES_SITE : ["Nom affiché","code de langue"]. Ajoute ou enlève des lignes.
+*/
+const SITE_URL = "https://cheikhmoussadiopsarr-jpg.github.io/Dahira-Safinatoul-Amaan/";
+const OUTILS_LIEU = { nom:"Guédiawaye", lat:14.7833, lng:-17.4, tz:0 };
+const AJUSTEMENT_PRIERES = { fajr:0, sunrise:0, dhuhr:0, asr:0, maghrib:0, isha:0 };
+const LANGUES_SITE = [
+  ["Français","fr"], ["English","en"], ["العربية","ar"], ["Wolof","wo"],
+  ["Español","es"], ["Português","pt"], ["Italiano","it"], ["Deutsch","de"],
+  ["Türkçe","tr"], ["Bahasa Indonesia","id"], ["Русский","ru"], ["中文","zh-CN"]
+];
+/* ========== FIN DES RÉGLAGES : ne touche pas en dessous ========== */
+
+(function(){
+var d=document,$=function(i){return d.getElementById(i)};
+var track=$('track');if(!track)return;
+var esc=function(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var norm=function(s){return String(s==null?'':s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\u0600-\u06ff]+/g,' ').trim()};
+var LS={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}},del:function(k){try{localStorage.removeItem(k)}catch(e){}}};
+var G=function(f){try{return f()}catch(e){return undefined}};
+var IC={
+  loupe:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+  chap:'<circle cx="12" cy="11" r="7.5" stroke-width="2.8" stroke-dasharray="0.1 4.1"/><path d="M12 19v4"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+  moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+  share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>'
+};
+var svg=function(k){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+IC[k]+'</svg>'};
+var OUTILS=[
+  ['chapelet','Chapelet électronique','Compter ton wird','chap'],
+  ['prieres','Heures de prière','Pour '+OUTILS_LIEU.nom,'clock'],
+  ['qibla','Qibla','Direction de La Mecque','compass'],
+  ['theme','Thème','Clair, sombre ou auto','moon'],
+  ['langues','Langues','Traduire le site','globe'],
+  ['partager','Partager et installer','Lien, WhatsApp, hors ligne','share']
+];
+
+/* ---------- Page Outils, menu, carte d'accueil ---------- */
+var sec=d.createElement('section');sec.id='outils';
+sec.innerHTML='<div class="trait"></div><h2>Outils</h2><p class="intro">Des outils pratiques pour le quotidien du talibé.</p><button class="rech-bar" data-rech>'+svg('loupe')+'<span>Rechercher dans le site…</span></button><div class="ou-grille">'+OUTILS.map(function(o){return '<button class="ou-t" data-ou="'+o[0]+'">'+svg(o[3])+'<b>'+o[1]+'</b><span>'+o[2]+'</span></button>'}).join('')+'</div>';
+var panel=d.createElement('div');panel.className='panel';panel.dataset.id='outils';panel.appendChild(sec);
+var co=track.querySelector('.panel[data-id="conservatoire"]');
+if(co)co.after(panel);else track.appendChild(panel);
+
+var nav=d.querySelector('nav');
+if(nav){var lk=d.createElement('a');lk.href='#outils';lk.textContent='Outils';var lc=nav.querySelector('a[href="#contact"]');
+  if(lc)nav.insertBefore(lk,lc);else nav.insertBefore(lk,nav.querySelector('.theme'))}
+var dg=d.querySelector('.dec-grille');
+if(dg){dg.insertAdjacentHTML('beforeend','<a class="dec-carte" href="#outils"><b>Outils</b><span>Chapelet, prières, Qibla, langues</span></a>');
+  [].forEach.call(dg.children,function(c,i){c.style.setProperty('--i',i)});
+  var dec=dg.closest('.decouvrir');
+  var h2=dec&&dec.querySelector('h2');
+  if(h2)h2.insertAdjacentHTML('afterend','<button class="rech-bar" data-rech>'+svg('loupe')+'<span>Rechercher (membre, Magal, poème, prière…)</span></button>')}
+var tb=d.querySelector('.topbar'),sw=tb&&tb.querySelector('.sw');
+if(tb&&sw){var right=d.createElement('div');right.style.cssText='display:flex;align-items:center;gap:12px';
+  var lb=d.createElement('button');lb.className='rech-ico';lb.setAttribute('data-rech','');lb.setAttribute('aria-label','Rechercher');lb.innerHTML=svg('loupe');
+  tb.appendChild(right);right.appendChild(lb);right.appendChild(sw)}
+
+function page(id){var a=d.querySelector('nav a[href="#'+id+'"]');if(a)a.click()}
+var vue=d.createElement('div');vue.id='ou-vue';d.body.appendChild(vue);
+var rv=d.createElement('div');rv.id='rech-vue';
+rv.innerHTML='<div class="rv"><div class="rv-tete"><input id="rv-q" type="search" placeholder="Rechercher…" autocomplete="off" autocapitalize="off" enterkeyhint="search" aria-label="Rechercher dans le site"><button class="rv-x" data-rv-close>Fermer</button></div><div id="rv-res"></div></div>';
+d.body.appendChild(rv);
+var timers=[],compass=false;
+function stopCompass(){compass=false;removeEventListener('deviceorientation',onO,true);removeEventListener('deviceorientationabsolute',onO,true)}
+function stopTimers(){timers.forEach(clearInterval);timers=[];stopCompass()}
+function closeAll(){
+  ['pole-vue','al-vue','fk-vue','ou-vue','rech-vue'].forEach(function(i){var e=$(i);if(e)e.classList.remove('on')});
+  var l=$('lightbox');if(l)l.classList.remove('ouvert');var a=$('al-lb');if(a)a.classList.remove('on');
+  stopTimers();
+}
+
+/* ---------- Chapelet ---------- */
+var ZIKR=[
+  {id:'istighfar',nom:'Astaghfirullah',ar:'أستغفر الله',cible:100},
+  {id:'tahlil',nom:'La ilaha illallah',ar:'لا إله إلا الله',cible:100},
+  {id:'salat',nom:'Salat sur le Prophète ﷺ',ar:'اللهم صل على محمد',cible:100},
+  {id:'tasbih',nom:'Soubhanallah',ar:'سبحان الله',cible:33},
+  {id:'hamd',nom:'Alhamdoulillah',ar:'الحمد لله',cible:33},
+  {id:'takbir',nom:'Allahou Akbar',ar:'الله أكبر',cible:33},
+  {id:'libre',nom:'Zikr libre',ar:'',cible:0}
+];
+var CIBLES=[33,99,100,300,1000,0];
+var today=function(){var n=new Date();return n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate()};
+var chap=(function(){var s={z:'istighfar',cible:100,n:0,tours:0,tot:0,jour:today()};
+  try{var o=JSON.parse(LS.get('dahira-chapelet')||'{}');for(var k in o)s[k]=o[k]}catch(e){}
+  if(s.jour!==today()){s.tours=0;s.tot=0;s.jour=today()}return s})();
+var saveChap=function(){LS.set('dahira-chapelet',JSON.stringify(chap))};
+var vib=function(n){try{if(navigator.vibrate)navigator.vibrate(n)}catch(e){}};
+function majChap(){
+  if(!$('ch-btn'))return;
+  var z=ZIKR.filter(function(x){return x.id===chap.z})[0]||ZIKR[0];
+  $('ch-ar').textContent=z.ar;$('ch-nom').textContent=z.nom;
+  $('ch-n').textContent=chap.n;
+  $('ch-c').textContent=chap.cible?'sur '+chap.cible:'sans limite';
+  $('ch-prog').style.strokeDashoffset=326.73*(1-(chap.cible?Math.min(1,chap.n/chap.cible):0));
+  $('ch-stats').innerHTML='Tours terminés : <b>'+chap.tours+'</b> · Total du jour : <b>'+chap.tot+'</b>';
+  [].forEach.call(d.querySelectorAll('[data-chz]'),function(b){b.classList.toggle('on',b.getAttribute('data-chz')===chap.z)});
+  [].forEach.call(d.querySelectorAll('[data-chc]'),function(b){b.classList.toggle('on',+b.getAttribute('data-chc')===chap.cible)});
+}
+function tap(){
+  if(chap.cible&&chap.n>=chap.cible)chap.n=0;
+  chap.n++;chap.tot++;$('ch-msg').textContent='';
+  if(chap.cible&&chap.n===chap.cible){chap.tours++;$('ch-msg').textContent='Machaa Allah, objectif atteint ✓';vib([120,60,200])}else vib(10);
+  saveChap();majChap();
+}
+
+/* ---------- Heures de prière et Qibla ---------- */
+function prieres(an,mo,jo,lat,lng,tz){
+  var R=Math.PI/180,sin=function(a){return Math.sin(a*R)},cos=function(a){return Math.cos(a*R)},tan=function(a){return Math.tan(a*R)};
+  var asin=function(x){return Math.asin(x)/R},acos=function(x){return Math.acos(x)/R},atan2=function(y,x){return Math.atan2(y,x)/R},acot=function(x){return Math.atan(1/x)/R};
+  var fa=function(a){a=a-360*Math.floor(a/360);return a<0?a+360:a},fh=function(a){a=a-24*Math.floor(a/24);return a<0?a+24:a};
+  var j0=function(y,m,dd){if(m<=2){y-=1;m+=12}var A=Math.floor(y/100),B=2-A+Math.floor(A/4);return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+dd+B-1524.5};
+  var jd=j0(an,mo,jo)-lng/360;
+  function sun(t){var D=jd+t-2451545,g=fa(357.529+0.98560028*D),q=fa(280.459+0.98564736*D),L=fa(q+1.915*sin(g)+0.02*sin(2*g)),e=23.439-0.00000036*D,RA=fh(atan2(cos(e)*sin(L),cos(L))/15);return{d:asin(sin(e)*sin(L)),e:q/15-RA}}
+  var mid=function(t){return fh(12-sun(t).e)};
+  function ang(a,t,ccw){var dc=sun(t).d,x=(-sin(a)-sin(dc)*sin(lat))/(cos(dc)*cos(lat));if(x<-1||x>1)return NaN;var h=acos(x)/15;return mid(t)+(ccw?-h:h)}
+  function asr(f,t){var dc=sun(t).d;return ang(-acot(f+tan(Math.abs(lat-dc))),t,false)}
+  var o={fajr:ang(18,5/24,true),sunrise:ang(0.833,6/24,true),dhuhr:mid(12/24),asr:asr(1,13/24),maghrib:ang(0.833,18/24,false),isha:ang(17,18/24,false)};
+  var k=tz-lng/15;for(var n in o)o[n]+=k;
+  return o;
+}
+function qibla(lat,lon){var r=Math.PI/180,kl=21.4225,ko=39.8262,dl=(ko-lon)*r,y=Math.sin(dl)*Math.cos(kl*r),x=Math.cos(lat*r)*Math.sin(kl*r)-Math.sin(lat*r)*Math.cos(kl*r)*Math.cos(dl);return(Math.atan2(y,x)/r+360)%360}
+var lieu={nom:OUTILS_LIEU.nom,lat:OUTILS_LIEU.lat,lng:OUTILS_LIEU.lng,tz:OUTILS_LIEU.tz,gps:false};
+var mn=function(h){if(isNaN(h))return NaN;var m=Math.round(h*60);return((m%1440)+1440)%1440};
+var hm=function(m){return isNaN(m)?'--:--':('0'+Math.floor(m/60)).slice(-2)+':'+('0'+(m%60)).slice(-2)};
+function calc(plus){
+  var t=new Date(Date.now()+lieu.tz*3600000+plus*864e5);
+  var r=prieres(t.getUTCFullYear(),t.getUTCMonth()+1,t.getUTCDate(),lieu.lat,lieu.lng,lieu.tz);
+  if(!lieu.gps)for(var k in r)r[k]+=(AJUSTEMENT_PRIERES[k]||0)/60;
+  return r;
+}
+var nowMin=function(){var m=Math.floor(Date.now()/60000+lieu.tz*60);return((m%1440)+1440)%1440};
+var NOMP={fajr:['Fajr','الفجر'],sunrise:['Lever du soleil','الشروق'],dhuhr:['Dhuhr','الظهر'],asr:['Asr','العصر'],maghrib:['Maghrib','المغرب'],isha:['Isha','العشاء']};
+function majPr(){
+  var z=$('pr-zone');if(!z)return;
+  var r=calc(0),now=nowMin(),P5=['fajr','dhuhr','asr','maghrib','isha'],nk=null,diff=0,i;
+  for(i=0;i<P5.length;i++){var m=mn(r[P5[i]]);if(!isNaN(m)&&m>now){nk=P5[i];diff=m-now;break}}
+  var tm=r[nk||'fajr'];
+  if(!nk){nk='fajr';var t2=calc(1);tm=t2.fajr;diff=mn(t2.fajr)+1440-now}
+  var dt=new Date(Date.now()+lieu.tz*3600000).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});
+  $('pr-date').textContent=dt+' · '+lieu.nom;
+  var h=Math.floor(diff/60),mm=diff%60;
+  z.innerHTML='<div class="pr-next"><small>Prochaine prière</small><b>'+NOMP[nk][0]+' · '+hm(mn(tm))+'</b><span>dans '+(h?h+' h ':'')+mm+' min</span></div><div class="pr-liste">'
+   +['fajr','sunrise','dhuhr','asr','maghrib','isha'].map(function(k){return '<div class="pr-r'+(k===nk?' next':'')+'"><div><b>'+NOMP[k][0]+'</b><small>'+NOMP[k][1]+'</small></div><em>'+hm(mn(r[k]))+'</em></div>'}).join('')+'</div>';
+  [].forEach.call(d.querySelectorAll('[data-pr]'),function(b){b.classList.toggle('on',(b.getAttribute('data-pr')==='gps')===lieu.gps)});
+}
+function majQb(){
+  var f=$('qb-fl');if(!f)return;
+  var q=qibla(lieu.lat,lieu.lng);f.style.transform='rotate('+q+'deg)';
+  var pts=['le Nord','le Nord-Est','l\'Est','le Sud-Est','le Sud','le Sud-Ouest','l\'Ouest','le Nord-Ouest'];
+  $('qb-info').innerHTML='Qibla depuis <b>'+esc(lieu.nom)+'</b> : <b>'+Math.round(q)+'°</b> par rapport au Nord, vers '+pts[Math.round(q/45)%8]+'.';
+  [].forEach.call(d.querySelectorAll('[data-pr]'),function(b){b.classList.toggle('on',(b.getAttribute('data-pr')==='gps')===lieu.gps)});
+}
+function gps(){
+  var m=$('pr-msg')||$('qb-msg');
+  if(!navigator.geolocation){if(m)m.textContent='Position indisponible sur cet appareil.';return}
+  if(m)m.textContent='Recherche de ta position…';
+  navigator.geolocation.getCurrentPosition(function(p){
+    lieu={nom:'Ma position',lat:p.coords.latitude,lng:p.coords.longitude,tz:-new Date().getTimezoneOffset()/60,gps:true};
+    if(m)m.textContent='';majPr();majQb();
+  },function(){if(m)m.textContent='Position refusée : les réglages restent ceux de '+OUTILS_LIEU.nom+'.'},{timeout:10000,maximumAge:600000});
+}
+function lieuDefaut(){lieu={nom:OUTILS_LIEU.nom,lat:OUTILS_LIEU.lat,lng:OUTILS_LIEU.lng,tz:OUTILS_LIEU.tz,gps:false};majPr();majQb()}
+function onO(e){
+  var h=null;
+  if(typeof e.webkitCompassHeading==='number')h=e.webkitCompassHeading;
+  else if((e.absolute||e.type==='deviceorientationabsolute')&&e.alpha!=null)h=360-e.alpha;
+  if(h==null||!$('qb-rose'))return;
+  $('qb-rose').style.transform='rotate('+(-h)+'deg)';
+  var q=qibla(lieu.lat,lieu.lng),df=((q-h+540)%360)-180;
+  $('qb').classList.toggle('ok',Math.abs(df)<5);
+  $('qb-msg').textContent=Math.abs(df)<5?'Tu fais face à la Qibla ✓':'Tourne jusqu\'à ce que la flèche dorée pointe en haut.';
+}
+function boussole(){
+  var m=$('qb-msg'),DO=window.DeviceOrientationEvent;
+  if(!DO){m.textContent='Boussole non disponible sur cet appareil.';return}
+  var go=function(){compass=true;addEventListener('deviceorientationabsolute',onO,true);addEventListener('deviceorientation',onO,true);m.textContent='Tourne jusqu\'à ce que la flèche dorée pointe en haut.'};
+  if(typeof DO.requestPermission==='function'){DO.requestPermission().then(function(r){if(r==='granted')go();else m.textContent='Autorisation refusée.'}).catch(function(){m.textContent='Boussole non disponible.'})}
+  else go();
+}
+
+/* ---------- Thème ---------- */
+function themeActif(){return LS.get('dahira-theme')||'auto'}
+function setTheme(t){
+  var sys=function(){return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'};
+  if(t==='auto'){LS.del('dahira-theme');d.documentElement.setAttribute('data-theme',sys())}
+  else{LS.set('dahira-theme',t);d.documentElement.setAttribute('data-theme',t)}
+  [].forEach.call(d.querySelectorAll('[data-th]'),function(b){b.classList.toggle('on',b.getAttribute('data-th')===t)});
+}
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(e){if(!LS.get('dahira-theme'))d.documentElement.setAttribute('data-theme',e.matches?'dark':'light')})}catch(e){}
+
+/* ---------- Contenu de chaque outil ---------- */
+function offline(){
+  if(!('serviceWorker' in navigator))return 'Non disponible sur ce navigateur.';
+  return navigator.serviceWorker.controller?'Activé ✓ : le site s\'ouvre même sans internet (les vidéos YouTube demandent internet).':'En préparation : recharge la page une fois pour l\'activer.';
+}
+var R={
+  chapelet:{html:function(){return '<h2>Chapelet électronique</h2><p class="ou-sub">Touche le grand cercle à chaque zikr. Ton compteur est gardé sur ce téléphone.</p><div class="ch-ar" id="ch-ar"></div><div class="ch-nom" id="ch-nom"></div><button class="ch-btn" id="ch-btn" data-ch="tap" aria-label="Compter un zikr"><svg viewBox="0 0 120 120"><circle class="ch-fond" cx="60" cy="60" r="52"/><circle class="ch-prog" id="ch-prog" cx="60" cy="60" r="52"/></svg><span class="ch-n" id="ch-n">0</span><span class="ch-c" id="ch-c"></span></button><div class="ch-stats" id="ch-stats"></div><div class="ch-msg" id="ch-msg"></div><div class="ou-lab">Zikr</div><div class="al-annees">'+ZIKR.map(function(z){return '<button class="al-chip" data-chz="'+z.id+'">'+esc(z.nom)+'</button>'}).join('')+'</div><div class="ou-lab">Objectif</div><div class="al-annees">'+CIBLES.map(function(c){return '<button class="al-chip" data-chc="'+c+'">'+(c||'Libre')+'</button>'}).join('')+'</div><div class="ch-act"><button class="al-chip" data-ch="moins">−1</button><button class="al-chip" data-ch="reset">Remettre à zéro</button></div>'},init:majChap},
+  prieres:{html:function(){return '<h2>Heures de prière</h2><p class="ou-sub" id="pr-date"></p><div class="al-annees"><button class="al-chip" data-pr="gued">'+esc(OUTILS_LIEU.nom)+'</button><button class="al-chip" data-pr="gps">Ma position</button></div><div id="pr-msg" class="ou-note"></div><div id="pr-zone"></div><p class="ou-note">Heures calculées (Fajr 18°, Isha 17°, Asr standard). Elles peuvent différer de quelques minutes de celles de ta plateforme mouride : les responsables peuvent les ajuster.</p>'},init:function(){majPr();timers.push(setInterval(majPr,20000))}},
+  qibla:{html:function(){return '<h2>Qibla</h2><p class="ou-sub">La direction de la Kaaba.</p><div class="al-annees"><button class="al-chip" data-pr="gued">'+esc(OUTILS_LIEU.nom)+'</button><button class="al-chip" data-pr="gps">Ma position</button></div><div class="qb" id="qb"><div class="qb-haut"></div><div class="qb-rose" id="qb-rose"><span class="qb-n">N</span><div class="qb-fl" id="qb-fl"></div></div></div><p class="qb-info" id="qb-info"></p><p class="ch-msg" id="qb-msg"></p><button class="sh-btn or" data-qb="go">Activer la boussole</button><p class="ou-note">Pose le téléphone à plat, loin des objets métalliques. Sans boussole, la flèche dorée indique l\'angle par rapport au Nord.</p>'},init:majQb},
+  theme:{html:function(){var a=themeActif();return '<h2>Thème</h2><p class="ou-sub">Choisis l\'affichage du site. Le bouton soleil/lune du haut reste disponible.</p><div class="th-g">'+[['clair','light','Clair','Fond clair, textes foncés'],['sombre','dark','Sombre','Fond sombre, reposant le soir'],['auto','auto','Automatique','Suit le réglage de ton téléphone']].map(function(t){return '<button class="th-c'+(a===t[1]?' on':'')+'" data-th="'+t[1]+'"><span class="th-p '+t[0]+'"></span><span><b>'+t[2]+'</b><small>'+t[3]+'</small></span></button>'}).join('')+'</div>'}},
+  langues:{html:function(){return '<h2>Langues</h2><p class="ou-sub">Choisis ta langue : le site s\'ouvre traduit automatiquement.</p><div class="lg-g">'+LANGUES_SITE.map(function(l){var u=l[1]==='fr'?SITE_URL:'https://translate.google.com/translate?sl=fr&tl='+encodeURIComponent(l[1])+'&u='+encodeURIComponent(SITE_URL);return '<a class="lg-a" href="'+esc(u)+'" lang="'+esc(l[1])+'">'+esc(l[0])+'</a>'}).join('')+'</div><p class="ou-note">Traduction automatique par Google : certains noms (poèmes, titres) peuvent rester en français. « Français » ramène à la version d\'origine.</p>'}},
+  partager:{html:function(){return '<h2>Partager et installer</h2><p class="ou-sub">Fais connaître le Dahira.</p><button class="sh-btn" data-sh="partager">Partager le site</button><a class="sh-btn or" href="https://wa.me/?text='+encodeURIComponent('Dahira Safinatoul Amaan, Guédiawaye : '+SITE_URL)+'" target="_blank" rel="noopener">Envoyer sur WhatsApp</a><button class="sh-btn gris" data-sh="copier">Copier le lien</button><p class="ch-msg" id="sh-msg"></p><div class="ou-lab">Installer sur l\'écran d\'accueil</div><ol class="sh-liste"><li><b>iPhone</b> : Safari, bouton Partager, puis « Sur l\'écran d\'accueil ».</li><li><b>Android</b> : Chrome, menu ⋮, puis « Ajouter à l\'écran d\'accueil ».</li></ol><div class="ou-lab">Stockage</div><div class="sh-etat"><b>Mode hors ligne</b><br>'+offline()+'</div><div class="sh-etat">Ton thème et ton chapelet sont gardés sur ce téléphone.</div><button class="sh-btn gris" data-sh="effacer" style="margin-top:10px">Effacer mes données sur ce téléphone</button>'}}
+};
+function ouvrirOutil(id){
+  var r=R[id];if(!r)return;stopTimers();
+  vue.innerHTML='<div class="ou-c"><button class="ou-retour" data-ou-close>Retour</button>'+r.html()+'</div>';
+  vue.classList.add('on');vue.scrollTop=0;if(r.init)r.init();
+}
+function fermerOutil(){vue.classList.remove('on');stopTimers()}
+
+/* ---------- Recherche ---------- */
+var SUG=['Magal','Kazu Rajab','Faridj','Chapelet','Prière','Membres'],IDX=null,cur=[];
+function parseP(s){s=String(s).replace(/\s+/g,' ').trim();var m=s.match(/^(.*?)\s*\(\s*(.*?)\s*\)\s*$/);var n=(m?m[1]:s).replace(/\s*-\s*/g,' - ').toLowerCase().replace(/(^|\s|-)([a-z])/g,function(x,a,b){return a+b.toUpperCase()});return{n:n,d:m?m[2]:''}}
+function openPole(k){[].forEach.call(d.querySelectorAll('.bu-p b'),function(b){if(b.textContent===k){var c=b.closest('.bu-p');if(c)c.click()}})}
+function openFulk(y){page('albums');var b=d.querySelector('[data-fk-open="fulk"]');if(b)b.click();var yb=d.querySelector('[data-fk-year="'+y+'"]');if(yb)yb.click()}
+function setVal(id,v){var q=$(id);if(q){q.value=v;q.dispatchEvent(new Event('input',{bubbles:true}))}}
+function build(){
+  var L=[];
+  function add(k,t,s,fn,extra){if(!t)return;L.push({k:k,t:t,s:s||'',h:norm([t,s,extra].join(' ')),fn:fn})}
+  [['accueil','Accueil','Photos du Dahira','stories'],['responsables','Responsables','Responsables moraux et bureau','djewrign'],['bureau','Bureau administratif','Membres du bureau, pôles, commissions','poles commissions'],['membres','Membres','Liste des membres du Dahira',''],['albums','Albums','Jour de Dahira, Magal, Laylatoul Qadr, Gamou, Fulk','jokko photos videos'],['calendrier','Calendrier','Prochaines dates religieuses','hegire lune date'],['temoignages','Témoignages','Vidéos de nos membres',''],['conservatoire','Conservatoire','Longues vidéos et conférences',''],['outils','Outils','Chapelet, prières, Qibla, langues',''],['contact','Contact','Téléphone, email, Instagram, TikTok','instagram tiktok whatsapp adresse']].forEach(function(p){add('Page',p[1],p[2],function(){page(p[0])},p[3])});
+  ['Grand Magal de Touba','Gamou','Kazu Rajab','Laylatoul Qadr','Début de Ramadan','Korité','Tabaski','Tamkharit','Nouvel an musulman'].forEach(function(n){add('Date',n,'Calendrier',function(){page('calendrier')},'fete evenement')});
+  OUTILS.forEach(function(o){add('Outil',o[1],o[2],function(){page('outils');ouvrirOutil(o[0])},o[0]==='prieres'?'priere salat horaires':o[0]==='chapelet'?'wird zikr tasbih':o[0]==='partager'?'installer hors ligne whatsapp':'')});
+  (G(function(){return RESPONSABLES})||[]).forEach(function(r){add('Responsable',r.nom,r.role,function(){page('responsables')})});
+  (G(function(){return BUREAU_DAHIRA})||[]).forEach(function(m){if(m.poste||m.nom)add('Bureau',m.poste||m.nom,m.poste?m.nom:'',function(){page('bureau')})});
+  (G(function(){return MEMBRES_DAHIRA})||[]).forEach(function(m){add('Membre',m.nom,m.info,function(){page('membres');setVal('mb-q',m.nom)})});
+  var po=G(function(){return POLES_INFO})||{};
+  Object.keys(po).forEach(function(k){var p=po[k];add('Pôle',k,p.activite,function(){page('bureau');openPole(k)},(p.responsable||'')+' '+(p.membres||[]).map(function(x){return x.nom+' '+x.role}).join(' '))});
+  (G(function(){return COMMISSIONS})||[]).forEach(function(c){add('Commission',c.nom,'Responsable : '+c.resp,function(){page('bureau')},c.txt)});
+  [['jour','Jour de Dahira'],['magal','Magal'],['qadr','Laylatoul Qadr'],['gamou','Gamou']].forEach(function(c){add('Album',c[1],'Photos, vidéos et audios',function(){page('albums');var b=d.querySelector('[data-cat="'+c[0]+'"]');if(b)b.click()})});
+  add('Album','Dahira Jokko Fulk','Premier jeudi du mois',function(){page('albums');var b=d.querySelector('[data-fk-open="jokko"]');if(b)b.click()},'ramadan jeudi');
+  (G(function(){return DAHIRA_ALBUMS})||[]).forEach(function(a){var n=a.titre||({jour:'Jour de Dahira',magal:'Magal',qadr:'Laylatoul Qadr',gamou:'Gamou'}[a.cat]||'Album');add('Album',n,a.date,function(){page('albums');setVal('al-q',n)})});
+  var fa=G(function(){return FULK_ANNEES})||{},fp=G(function(){return FULK_PRESTATIONS})||{};
+  Object.keys(fa).sort().reverse().forEach(function(y){add('FULK','FULK '+y,(fp[y]&&fp[y].resume)||'',function(){openFulk(y)})});
+  Object.keys(fp).forEach(function(y){(fp[y].videos||[]).forEach(function(v){(v.programme||[]).forEach(function(s){var q=parseP(s);add('Poème',q.n,'FULK '+y+' · '+v.titre+(q.d?' · '+q.d:''),function(){openFulk(y)})})})});
+  (G(function(){return TEMOIGNAGES})||[]).forEach(function(v){add('Témoignage',v.titre,'',function(){page('temoignages')})});
+  (G(function(){return CONSERVATOIRE})||[]).forEach(function(v){add('Conservatoire',v.titre,v.infos,function(){page('conservatoire')})});
+  return L;
+}
+function rendRech(q){
+  var nq=norm(q),res=$('rv-res');
+  if(!nq){cur=[];res.innerHTML='<p class="ou-sub">Essaie :</p><div class="rv-sug">'+SUG.map(function(s){return '<button class="al-chip" data-rv-s="'+esc(s)+'">'+esc(s)+'</button>'}).join('')+'</div>';return}
+  if(!IDX)IDX=build();
+  var tk=nq.split(' ');
+  var out=IDX.filter(function(it){return tk.every(function(t){return it.h.indexOf(t)>-1})});
+  out.forEach(function(it){var n=norm(it.t);it.sc=n.indexOf(nq)===0?0:n.indexOf(nq)>-1?1:2});
+  out.sort(function(a,b){return a.sc-b.sc});
+  cur=out.slice(0,40);
+  res.innerHTML=cur.length?cur.map(function(it,i){return '<button class="rv-r" data-rv-i="'+i+'"><span class="rv-k">'+esc(it.k)+'</span><b>'+esc(it.t)+'</b>'+(it.s?'<small>'+esc(it.s)+'</small>':'')+'</button>'}).join(''):'<div class="vide">Aucun résultat pour « '+esc(q)+' ».</div>';
+}
+function ouvrirRech(){IDX=null;rv.classList.add('on');$('rv-q').value='';rendRech('');$('rv-q').focus()}
+function fermerRech(){rv.classList.remove('on');$('rv-q').blur()}
+$('rv-q').addEventListener('input',function(e){rendRech(e.target.value)});
+
+/* ---------- Clics ---------- */
+d.addEventListener('click',function(e){
+  var t=e.target.closest('[data-ou],[data-ou-close],[data-rech],[data-rv-close],[data-rv-i],[data-rv-s],[data-ch],[data-chz],[data-chc],[data-th],[data-pr],[data-qb],[data-sh]');
+  if(!t)return;
+  var A=function(n){return t.getAttribute(n)},H=function(n){return t.hasAttribute(n)};
+  if(H('data-rech'))ouvrirRech();
+  else if(H('data-rv-close'))fermerRech();
+  else if(H('data-rv-s')){$('rv-q').value=A('data-rv-s');rendRech(A('data-rv-s'))}
+  else if(H('data-rv-i')){var it=cur[+A('data-rv-i')];if(it){closeAll();it.fn()}}
+  else if(H('data-ou-close'))fermerOutil();
+  else if(H('data-ou'))ouvrirOutil(A('data-ou'));
+  else if(H('data-ch')){var c=A('data-ch');
+    if(c==='tap')tap();
+    else if(c==='moins'){if(chap.n>0){chap.n--;if(chap.tot>0)chap.tot--;saveChap();majChap()}}
+    else if(c==='reset'){chap.n=0;saveChap();$('ch-msg').textContent='';majChap()}}
+  else if(H('data-chz')){var z=ZIKR.filter(function(x){return x.id===A('data-chz')})[0];if(z){chap.z=z.id;chap.cible=z.cible;chap.n=0;saveChap();$('ch-msg').textContent='';majChap()}}
+  else if(H('data-chc')){chap.cible=+A('data-chc');if(chap.cible&&chap.n>chap.cible)chap.n=0;saveChap();majChap()}
+  else if(H('data-th'))setTheme(A('data-th'));
+  else if(H('data-pr')){A('data-pr')==='gps'?gps():lieuDefaut()}
+  else if(H('data-qb'))boussole();
+  else if(H('data-sh')){var s=A('data-sh'),m=$('sh-msg');
+    if(s==='partager'){if(navigator.share)navigator.share({title:'Dahira Safinatoul Amaan',text:'Dahira Safinatoul Amaan, Guédiawaye',url:SITE_URL}).catch(function(){});else s='copier'}
+    if(s==='copier'){if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(SITE_URL).then(function(){m.textContent='Lien copié ✓'},function(){m.textContent=SITE_URL});else m.textContent=SITE_URL}
+    else if(s==='effacer'){LS.del('dahira-chapelet');chap.n=0;chap.tours=0;chap.tot=0;m.textContent='Données effacées ✓'}}
+});
+d.addEventListener('keydown',function(e){if(e.key==='Escape'){if(rv.classList.contains('on'))fermerRech();else if(vue.classList.contains('on'))fermerOutil()}});
+
+/* ---------- Mode hors ligne ---------- */
+if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+})();
+</script>
+
 
   
 
