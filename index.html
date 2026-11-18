@@ -1473,6 +1473,43 @@ new MutationObserver(maj).observe(vue,{childList:true,subtree:true});
 maj();
 })();
 </script>
+  <style>
+#albums .al-cat{position:relative;overflow:hidden;isolation:isolate}
+#albums .al-cat::before,#albums .al-cat::after{content:"";position:absolute;inset:0;z-index:-1;opacity:0;pointer-events:none;transition:opacity 1s ease}
+#albums.fx-jour .al-cat[data-cat="jour"]::before{background:url("Dahirajeudi.jpg.jpg") center/cover no-repeat}
+#albums.fx-magal .al-cat[data-cat="magal"]::before{background:url("magal.jpg.jpg") center/cover no-repeat}
+#albums.fx-fulk .al-cat[data-fk-open]::before{background:url("fdfulk.jpg.jpg") center/cover no-repeat}
+#albums.fx-jour .al-cat[data-cat="jour"]::after,
+#albums.fx-magal .al-cat[data-cat="magal"]::after,
+#albums.fx-fulk .al-cat[data-fk-open]::after{background:linear-gradient(90deg,rgba(8,40,30,.9) 0%,rgba(8,40,30,.7) 55%,rgba(8,40,30,.4) 100%)}
+#albums.fx-on.fx-jour .al-cat[data-cat="jour"]::before,
+#albums.fx-on.fx-jour .al-cat[data-cat="jour"]::after,
+#albums.fx-on.fx-magal .al-cat[data-cat="magal"]::before,
+#albums.fx-on.fx-magal .al-cat[data-cat="magal"]::after,
+#albums.fx-on.fx-fulk .al-cat[data-fk-open]::before,
+#albums.fx-on.fx-fulk .al-cat[data-fk-open]::after{opacity:1}
+</style>
+<script>
+(function(){
+var sec=document.getElementById('albums'),cats=document.getElementById('al-cats');
+if(!sec||!cats)return;
+var IMG={jour:'Dahirajeudi.jpg.jpg',magal:'magal.jpg.jpg',fulk:'fdfulk.jpg.jpg'};
+Object.keys(IMG).forEach(function(k){
+  var im=new Image();
+  im.onload=function(){sec.classList.add('fx-'+k)};
+  im.src=encodeURI(IMG[k]);
+});
+function on(){sec.classList.add('fx-on')}
+if('IntersectionObserver' in window){
+  var io=new IntersectionObserver(function(en){
+    if(en[0].isIntersecting){setTimeout(on,150);io.disconnect()}
+  },{threshold:.5});
+  io.observe(cats);
+}else on();
+})();
+</script>
+
+  
 
 
 </body>
