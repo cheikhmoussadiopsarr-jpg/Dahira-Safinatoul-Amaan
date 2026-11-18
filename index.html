@@ -1271,6 +1271,108 @@ sec.addEventListener('click',function(e){
 rend();
 })();
 </script>
+  <style>
+#fk-vue .carte .info{padding:14px 16px 16px}
+.fp-sous{font-size:.82rem;color:#667;margin:2px 0 10px}
+.fp-prog{border-top:1px solid rgba(201,162,75,.5);padding-top:10px}
+.fp-tit{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--vert-clair);font-weight:700;margin-bottom:8px}
+.fp-liste{list-style:none;margin:0;padding:0;counter-reset:fp;display:grid;gap:7px}
+.fp-liste li{counter-increment:fp;display:flex;gap:10px;align-items:flex-start}
+.fp-liste li::before{content:counter(fp);flex:none;width:22px;height:22px;margin-top:1px;border-radius:50%;background:var(--vert);color:var(--or);font-size:.72rem;font-weight:700;display:grid;place-items:center}
+.fp-t b{display:block;font-weight:700;font-size:.92rem;line-height:1.3;text-transform:capitalize;color:var(--texte)}
+.fp-t small{display:block;font-size:.76rem;color:var(--vert-clair)}
+.fp-yt{display:inline-block;margin-top:12px;font-size:.8rem;color:var(--vert);border:1px solid var(--vert-clair);border-radius:999px;padding:5px 14px;text-decoration:none}
+[data-theme="dark"] .fp-sous{color:#9fb0a7}
+[data-theme="dark"] .fp-tit{color:#e3c274}
+[data-theme="dark"] .fp-t small{color:#7fd0ac}
+[data-theme="dark"] .fp-yt{color:#e3c274;border-color:#2f9a72}
+</style>
+<script>
+/* ========== FULK : prestations avec programme ==========
+   Pour chaque vidéo : titre, url (lien YouTube) et programme (liste).
+   Programme : "NOM DU POÈME (auteur ou référence)". La parenthèse est facultative.
+   Nouvelle vidéo : copie un bloc { ... }, colle-le dessous.
+   Autre année (2023, 2024...) : copie le bloc "2022": { ... }, colle-le dessous, change l'année.
+*/
+const FULK_PRESTATIONS = {
+  "2022": {
+    resume:"Prestation K1 · Dahira Safinatoul Fulk 2022",
+    sous:"Prestation K1 · Dahira Safinatoul Fulk 2022",
+    videos:[
+      { titre:"Jour 5", url:"https://youtu.be/HnwVeSrQkNg",
+        programme:[
+          "YA KHAYRA DAYFIN (WKSM)",
+          "JAZBU (WKSM 63)",
+          "FARIDJ"
+        ] },
+      { titre:"Jour 12", url:"https://youtu.be/SMOkz_iNues",
+        programme:[
+          "YAKHAYRA - YA MUKRIMA (WKSM)",
+          "MIDADI (WKSM)",
+          "WAJAHTU LIL LAHI HAMDAN - WAJAHTI LIL LAHII WADJ (SEGN CISSE)",
+          "WADIABA HAMDU",
+          "ALHAMDOULILAH ALAL LOUHA I",
+          "MADALKHABIROU - LISSANOU SHUKRI (WKSM)",
+          "AHBABTU (DARUU MUKHTI)",
+          "FARIDJ"
+        ] },
+      { titre:"Jour 19", url:"https://youtu.be/iAIkeDfGiRU",
+        programme:[
+          "YA RABBI BIL MUSTAPHA",
+          "YA KHAYRA DAYFIN (S MOUSTAPHA SY)",
+          "YA MUKRIMA DAYFIN (S MOUSTAPHA SY)",
+          "MAWAHIBOU (WKSM 71)",
+          "LIYANKHADA - RAFAHNA - MADAHTU (SEGN MAHIB GUEYE)",
+          "WAJEUHTU KUL LIYAZA (WKSM)",
+          "FARIDJ"
+        ] }
+    ]
+  }
+};
+/* ========== FIN DE LA ZONE FULK PRESTATIONS : ne touche pas en dessous ========== */
+
+(function(){
+if(typeof FULK_ANNEES==='undefined')return;
+var esc=function(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var yt=function(u){var m=String(u).match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/);return m?m[1]:''};
+var index={};
+Object.keys(FULK_PRESTATIONS).forEach(function(y){
+  var p=FULK_PRESTATIONS[y],o=FULK_ANNEES[y];if(!o)return;
+  if(p.resume)o.resume=p.resume;
+  o.videos=p.videos.map(function(v){return {titre:v.titre,url:v.url}});
+  p.videos.forEach(function(v){var id=yt(v.url);if(id)index[id]={v:v,sous:p.sous||p.resume||''}});
+});
+var tot=0,ny=0;
+Object.keys(FULK_ANNEES).forEach(function(y){ny++;var o=FULK_ANNEES[y];tot+=(o.photos||[]).length+(o.videos||[]).length});
+var sm=document.querySelector('[data-fk-open="fulk"] small');
+if(sm)sm.textContent=ny+' année(s), '+tot+' élément(s)';
+
+var vue=document.getElementById('fk-vue');if(!vue)return;
+function parse(s){
+  s=String(s).replace(/\s+/g,' ').trim();
+  var m=s.match(/^(.*?)\s*\(\s*(.*?)\s*\)\s*$/);
+  var n=(m?m[1]:s).replace(/\s*-\s*/g,' - ').toLowerCase();
+  return {n:n,d:m?m[2]:''};
+}
+function enhance(){
+  [].forEach.call(vue.querySelectorAll('.carte'),function(c){
+    if(c.dataset.fp)return;
+    var f=c.querySelector('iframe');if(!f)return;
+    var m=f.src.match(/embed\/([\w-]{11})/),e=m&&index[m[1]];if(!e)return;
+    var info=c.querySelector('.info');if(!info)return;
+    c.dataset.fp='1';
+    var h3=info.querySelector('h3');
+    if(h3&&e.sous)h3.insertAdjacentHTML('afterend','<div class="fp-sous">'+esc(e.sous)+'</div>');
+    var prog=e.v.programme||[];
+    var html=prog.length?'<div class="fp-prog"><div class="fp-tit">Programme</div><ol class="fp-liste">'+prog.map(function(s){var p=parse(s);return '<li><span class="fp-t"><b>'+esc(p.n)+'</b>'+(p.d?'<small>'+esc(p.d)+'</small>':'')+'</span></li>'}).join('')+'</ol></div>':'';
+    html+='<a class="fp-yt" href="https://youtu.be/'+m[1]+'" target="_blank" rel="noopener">Voir sur YouTube</a>';
+    info.insertAdjacentHTML('beforeend',html);
+  });
+}
+new MutationObserver(enhance).observe(vue,{childList:true,subtree:true});
+})();
+</script>
+
 
 
 
