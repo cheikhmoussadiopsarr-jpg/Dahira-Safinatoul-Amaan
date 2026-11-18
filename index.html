@@ -1282,18 +1282,22 @@ rend();
 .fp-t b{display:block;font-weight:700;font-size:.92rem;line-height:1.3;text-transform:capitalize;color:var(--texte)}
 .fp-t small{display:block;font-size:.76rem;color:var(--vert-clair)}
 .fp-yt{display:inline-block;margin-top:12px;font-size:.8rem;color:var(--vert);border:1px solid var(--vert-clair);border-radius:999px;padding:5px 14px;text-decoration:none}
+.fk-app{display:inline-block;border-left:3px solid var(--or);padding:2px 0 2px 10px;font-size:.78rem;letter-spacing:.07em;font-weight:700;color:var(--vert);line-height:1.4}
+.al-ligne small.fk-app{display:block;border-left:0;padding:0;font-size:.7rem;letter-spacing:.05em}
 [data-theme="dark"] .fp-sous{color:#9fb0a7}
 [data-theme="dark"] .fp-tit{color:#e3c274}
-[data-theme="dark"] .fp-t small{color:#7fd0ac}
+[data-theme="dark"] .carte .fp-t small{color:#7fd0ac!important}
 [data-theme="dark"] .fp-yt{color:#e3c274;border-color:#2f9a72}
+[data-theme="dark"] p.fk-app{color:#e3c274!important}
 </style>
 <script>
 /* ========== FULK : prestations avec programme ==========
    Pour chaque vidéo : titre, url (lien YouTube) et programme (liste).
    Programme : "NOM DU POÈME (auteur ou référence)". La parenthèse est facultative.
    Nouvelle vidéo : copie un bloc { ... }, colle-le dessous.
-   Autre année (2023, 2024...) : copie le bloc "2022": { ... }, colle-le dessous, change l'année.
+   Nouvelle année : copie un bloc "2026": { ... }, colle-le dessous (avec une virgule), change l'année.
 */
+const FULK_APPELLATION = "AL MASHRABUSH-SHAFI MINAL MAN BAHIS-SHAFI";
 const FULK_PRESTATIONS = {
   "2022": {
     resume:"Prestation K1 · Dahira Safinatoul Fulk 2022",
@@ -1327,6 +1331,61 @@ const FULK_PRESTATIONS = {
           "FARIDJ"
         ] }
     ]
+  },
+  "2023": {
+    resume:FULK_APPELLATION,
+    videos:[
+      { titre:"Jour 5", url:"https://youtu.be/dHVxNWipH7o",
+        programme:[
+          "YA KHAYRA DAYFIN (S MOUSTAPHA DIOP)",
+          "MAWAHIBOU (WKSM 71)",
+          "WADJEUTOU KOUL LIYAZA (WKSM)",
+          "WADIABA HAMDOU",
+          "ALHAMDOULILAH ALAL LOUHA I",
+          "FARIDJ"
+        ] },
+      { titre:"Jour 23", url:"https://youtu.be/XCDKhRmO0jQ",
+        programme:[
+          "YA KHAYRA DAYFIN",
+          "MIDAADI (WKSM)",
+          "ZALAT LIHII",
+          "LIYANKHADA - RAFAHNA - MADAHTU (SEGN MAHIB GUEYE)",
+          "FARIDJ"
+        ] }
+    ]
+  },
+  "2024": {
+    resume:FULK_APPELLATION,
+    videos:[
+      { titre:"Jour 7", url:"https://youtu.be/-k8nWbrq5qg",
+        programme:[
+          "LIMAHINE BACHIRIN (WKSM)",
+          "MADDALIYAL - FUZTI (WKSM)",
+          "FARIDJ"
+        ] }
+    ]
+  },
+  "2025": {
+    resume:FULK_APPELLATION,
+    videos:[
+      { titre:"Jour 4", url:"https://youtu.be/T0fD-R_WMg4",
+        programme:[
+          "MOUKHADIMATOUL AMDAH (WKSM)",
+          "FARIDJ"
+        ] }
+    ]
+  },
+  "2026": {
+    resume:FULK_APPELLATION,
+    videos:[
+      { titre:"Jour 19", url:"https://youtu.be/YgNUmkCzebc",
+        programme:[
+          "YA KHAYRA DAYFIN (S CISSE)",
+          "MATLABOUL FAWZEYNI (S M LAMINE GUEYE)",
+          "FUZTI (REF HT THIES)",
+          "FARIDJ"
+        ] }
+    ]
   }
 };
 /* ========== FIN DE LA ZONE FULK PRESTATIONS : ne touche pas en dessous ========== */
@@ -1340,7 +1399,7 @@ Object.keys(FULK_PRESTATIONS).forEach(function(y){
   var p=FULK_PRESTATIONS[y],o=FULK_ANNEES[y];if(!o)return;
   if(p.resume)o.resume=p.resume;
   o.videos=p.videos.map(function(v){return {titre:v.titre,url:v.url}});
-  p.videos.forEach(function(v){var id=yt(v.url);if(id)index[id]={v:v,sous:p.sous||p.resume||''}});
+  p.videos.forEach(function(v){var id=yt(v.url);if(id)index[id]={v:v,sous:p.sous||''}});
 });
 var tot=0,ny=0;
 Object.keys(FULK_ANNEES).forEach(function(y){ny++;var o=FULK_ANNEES[y];tot+=(o.photos||[]).length+(o.videos||[]).length});
@@ -1355,6 +1414,9 @@ function parse(s){
   return {n:n,d:m?m[2]:''};
 }
 function enhance(){
+  [].forEach.call(vue.querySelectorAll('.fk-sub,.al-ligne small'),function(s){
+    if(s.textContent.trim()===FULK_APPELLATION)s.classList.add('fk-app');
+  });
   [].forEach.call(vue.querySelectorAll('.carte'),function(c){
     if(c.dataset.fp)return;
     var f=c.querySelector('iframe');if(!f)return;
@@ -1373,11 +1435,5 @@ new MutationObserver(enhance).observe(vue,{childList:true,subtree:true});
 })();
 </script>
 
-
-
-
-
-
-  
 </body>
 </html>
