@@ -2081,6 +2081,147 @@ d.addEventListener('keydown',function(e){
 });
 })();
 </script>
+  <style>
+/* ===== Membres : tableau Nom, Prénom, Poste occupé ===== */
+#mb-liste,#mb-nb{display:none!important}
+.mt-f{margin-bottom:12px}
+.mt-nb{font-size:.85rem;color:#667;margin:0 0 10px}
+.mt{background:var(--carte,#fff);border-radius:14px;overflow:hidden;border-left:5px solid var(--or);box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.mt-r{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.2fr) minmax(0,1.1fr);gap:8px;align-items:center;padding:10px 12px;border-top:1px solid rgba(201,162,75,.28)}
+.mt-h{background:var(--vert);color:var(--or);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;border-top:0}
+.mt-r:nth-child(even):not(.mt-h){background:rgba(14,59,44,.04)}
+.mt-r b{color:var(--vert);font-size:.95rem;line-height:1.25;overflow-wrap:anywhere}
+.mt-r>span{font-size:.92rem;line-height:1.25;overflow-wrap:anywhere}
+.mt-p{display:flex;flex-wrap:wrap;gap:4px}
+.mt-p i{font-style:normal;font-size:.68rem;font-weight:700;padding:2px 9px;border-radius:999px;color:#fff;background:#1d6b4f;white-space:nowrap}
+.mt-p i.p-cul{background:#c9a24b;color:#0e3b2c}
+.mt-p i.p-mul{background:#2f7f93}
+.mt-p i.p-adm{background:#0e3b2c;box-shadow:inset 0 0 0 1px #c9a24b}
+.mt-vide{padding:18px 14px;color:#667}
+[data-theme="dark"] .mt-nb,[data-theme="dark"] .mt-vide,[data-theme="dark"] .cm-txt{color:#9fb0a7}
+[data-theme="dark"] .mt-r b{color:#e3c274}
+[data-theme="dark"] .mt-r:nth-child(even):not(.mt-h){background:rgba(255,255,255,.03)}
+[data-theme="dark"] .mt-p i{background:#2f9a72}
+[data-theme="dark"] .mt-p i.p-cul{background:#c9a24b}
+[data-theme="dark"] .mt-p i.p-mul{background:#2f7f93}
+[data-theme="dark"] .mt-p i.p-adm{background:#14402f}
+
+/* ===== Commissions : une carte par commission avec ses membres ===== */
+.cm-liste{display:grid;gap:12px}
+.cm{background:var(--carte,#fff);border-radius:14px;overflow:hidden;border-left:5px solid var(--or);box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.cm-tete{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 14px;background:var(--vert);color:#fff}
+.cm-tete b{font-family:var(--police-titre);font-size:1.2rem}
+.cm-n{background:var(--or);color:var(--vert);font-weight:700;border-radius:999px;padding:2px 11px;font-size:.78rem;white-space:nowrap}
+.cm-corps{padding:12px 14px}
+.cm-txt{font-size:.85rem;color:#4a5a53;margin-bottom:6px;line-height:1.4}
+.cm-resp{font-size:.82rem;color:var(--vert-clair);font-weight:700;margin-bottom:8px}
+.cm-mem{display:flex;flex-wrap:wrap;gap:6px}
+.cm-mem span{background:#e8efe9;color:var(--vert);border-radius:999px;padding:4px 11px;font-size:.8rem;line-height:1.3}
+.cm-vide{font-size:.8rem;color:#9aa7a0}
+[data-theme="dark"] .cm-mem span{background:#223a30;color:#cfe0d6}
+[data-theme="dark"] .cm-resp{color:#7fd0ac}
+#track .panel.doux .cm{animation:douce var(--duree,1.2s) ease-out backwards;animation-delay:calc(var(--i,0)*90ms)}
+</style>
+<script>
+/* ========== MEMBRES DU DAHIRA ==========
+   nom, prenom, postes : une ligne par membre.
+   Un membre dans deux commissions : postes:["Organisation","Multimédia"]
+   Nouveau membre : copie une ligne, colle-la dessous, change les infos.
+   TRI_MEMBRES : "alphabetique" (par nom) ou "liste" (ordre ci-dessous)
+*/
+const TRI_MEMBRES = "alphabetique";
+const MEMBRES_LISTE = [
+  { nom:"Sylla",    prenom:"Baye Modou",           postes:["Organisation","Multimédia"] },
+  { nom:"Diop",     prenom:"Afia",                 postes:["Organisation"] },
+  { nom:"Ndiaye",   prenom:"Wilane",               postes:["Multimédia"] },
+  { nom:"Ka",       prenom:"Mamadou Mansour",      postes:["Organisation"] },
+  { nom:"Camara",   prenom:"Fallou",               postes:["Multimédia"] },
+  { nom:"Sarr",     prenom:"Cheikh Moussa Diop",   postes:["Organisation","Multimédia"] },
+  { nom:"Ka",       prenom:"Abdou Aziz",           postes:["Organisation"] },
+  { nom:"Fall",     prenom:"Fatma",                postes:["Culturelle"] },
+  { nom:"Ba",       prenom:"Mouhamed",             postes:["Organisation"] },
+  { nom:"Kâ",       prenom:"Massamba",             postes:["Organisation"] },
+  { nom:"Diop",     prenom:"Khadim",               postes:["Culturelle"] },
+  { nom:"Diop",     prenom:"Ada",                  postes:["Culturelle"] },
+  { nom:"Dieye",    prenom:"Adama",                postes:["Administration"] },
+  { nom:"Diop",     prenom:"Mouhamad",             postes:["Culturelle"] },
+  { nom:"Faye",     prenom:"Mame Cheikh Ibrahima", postes:["Administration"] },
+  { nom:"Sene",     prenom:"Soxna Fatou",          postes:["Culturelle"] },
+  { nom:"Diallo",   prenom:"Oumy Kalsoum",         postes:["Organisation"] },
+  { nom:"Gningue",  prenom:"Aicha",                postes:["Organisation"] },
+  { nom:"Senghor",  prenom:"Ibrahima",             postes:["Organisation"] },
+  { nom:"Ndiaye",   prenom:"Khadim",               postes:["Organisation"] },
+  { nom:"Diop",     prenom:"Ndella",               postes:["Culturelle"] },
+  { nom:"Ndiaye",   prenom:"Abdoulaye",            postes:["Organisation"] },
+  { nom:"Séne",     prenom:"Soxna Diarra",         postes:["Culturelle"] },
+  { nom:"Koundia",  prenom:"Fallou",               postes:["Organisation"] },
+  { nom:"Thiam",    prenom:"Ibrahima",             postes:["Culturelle"] },
+  { nom:"Ndao",     prenom:"Cheikh Ahmadou Bamba", postes:["Administration"] }
+];
+/* ========== COMMISSIONS ==========
+   nom : doit être écrit comme dans "postes" des membres. resp : responsable (facultatif).
+   L'ordre ci-dessous est l'ordre d'affichage.
+*/
+const COMMISSIONS_SITE = [
+  { nom:"Organisation",        resp:"Khadim Ndiaye",        txt:"Prépare et coordonne les événements et rencontres." },
+  { nom:"Culturelle",          resp:"Khadim Diop",          txt:"Transmission du savoir, khassaïdes et enseignements." },
+  { nom:"Multimédia",          resp:"Ahmadou Wilan Ndiaye", txt:"Photos, vidéos, audios et site du Dahira." },
+  { nom:"Administration",      resp:"",                     txt:"Gestion administrative et suivi interne du Dahira." },
+  { nom:"Finance",             resp:"Fallou Diop",          txt:"Gestion des cotisations et des dépenses." },
+  { nom:"Secrétariat Général", resp:"Mansour Ka",           txt:"Coordination administrative, comptes rendus et courriers." }
+];
+/* ========== FIN DES RÉGLAGES : ne touche pas en dessous ========== */
+
+(function(){
+var d=document,$=function(i){return d.getElementById(i)};
+var esc=function(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var norm=function(s){return String(s==null?'':s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim()};
+var M=MEMBRES_LISTE.map(function(m,i){var p=m.postes||[];return {i:i,nom:m.nom,prenom:m.prenom,postes:p,pn:p.map(norm),h:norm([m.nom,m.prenom].concat(p).join(' '))}});
+if(TRI_MEMBRES!=='liste')M.sort(function(a,b){return (a.nom+' '+a.prenom).localeCompare(b.nom+' '+b.prenom,'fr',{sensitivity:'base'})||a.i-b.i});
+var CL={organisation:'p-org',culturelle:'p-cul',multimedia:'p-mul',administration:'p-adm'};
+var pl=function(n){return n>1?'s':''};
+var dans=function(c){var k=norm(c.nom);return M.filter(function(m){return m.pn.indexOf(k)>-1})};
+
+/* ----- Page Membres ----- */
+var sec=$('membres');
+if(sec){
+  var old=$('mb-liste'),q=$('mb-q'),fc='',fq=q?q.value:'';
+  var w=d.createElement('div');
+  w.innerHTML='<div class="al-annees mt-f" id="mt-f"></div><p class="mt-nb" id="mt-nb"></p><div class="mt" id="mt"></div>';
+  if(old)old.after(w);else sec.appendChild(w);
+  if(q)q.placeholder='Chercher un membre ou une commission…';
+  var chips=[['','Tous',M.length]].concat(COMMISSIONS_SITE.map(function(c){return [norm(c.nom),c.nom,dans(c).length]}).filter(function(x){return x[2]>0}));
+  $('mt-f').innerHTML=chips.map(function(c){return '<button class="al-chip" data-mt="'+esc(c[0])+'">'+esc(c[1])+' ('+c[2]+')</button>'}).join('');
+  var ligne=function(m){return '<div class="mt-r"><b>'+esc(m.nom)+'</b><span>'+esc(m.prenom)+'</span><span class="mt-p">'+m.postes.map(function(p){return '<i class="'+(CL[norm(p)]||'')+'">'+esc(p)+'</i>'}).join('')+'</span></div>'};
+  var rend=function(){
+    var tk=norm(fq).split(' ').filter(Boolean);
+    var l=M.filter(function(m){return (!fc||m.pn.indexOf(fc)>-1)&&tk.every(function(t){return m.h.indexOf(t)>-1})});
+    $('mt-nb').textContent=l.length+' membre'+pl(l.length)+((fc||tk.length)?' trouvé'+pl(l.length):' au total');
+    $('mt').innerHTML='<div class="mt-r mt-h"><span>Nom</span><span>Prénom</span><span>Poste occupé</span></div>'+(l.length?l.map(ligne).join(''):'<div class="mt-vide">Aucun membre trouvé.</div>');
+    [].forEach.call($('mt-f').children,function(b){b.classList.toggle('on',b.getAttribute('data-mt')===fc)});
+  };
+  $('mt-f').addEventListener('click',function(e){var b=e.target.closest('[data-mt]');if(!b)return;fc=b.getAttribute('data-mt');rend()});
+  if(q)q.addEventListener('input',function(e){fq=e.target.value;rend()});
+  rend();
+}
+
+/* ----- Commissions (page Bureau) ----- */
+var cartes=COMMISSIONS_SITE.map(function(c,i){
+  var l=dans(c);
+  return '<div class="cm" style="--i:'+Math.min(i,8)+'"><div class="cm-tete"><b>'+esc(c.nom)+'</b>'+(l.length?'<span class="cm-n">'+l.length+' membre'+pl(l.length)+'</span>':'')+'</div><div class="cm-corps">'
+   +(c.txt?'<p class="cm-txt">'+esc(c.txt)+'</p>':'')+(c.resp?'<p class="cm-resp">Responsable : '+esc(c.resp)+'</p>':'')
+   +(l.length?'<div class="cm-mem">'+l.map(function(m){return '<span>'+esc(m.nom+' '+m.prenom)+'</span>'}).join('')+'</div>':'<p class="cm-vide">Membres à venir.</p>')+'</div></div>';
+}).join('');
+var bu=$('bureau'),g=bu&&bu.querySelector('.co-grille');
+if(g){var z=d.createElement('div');z.className='cm-liste';z.innerHTML=cartes;g.replaceWith(z)}
+else if(bu)bu.insertAdjacentHTML('beforeend','<h3>Commissions</h3><div class="cm-liste">'+cartes+'</div>');
+
+/* ----- La recherche du site connaît aussi ces membres et commissions ----- */
+try{MEMBRES_DAHIRA.splice(0,MEMBRES_DAHIRA.length);M.forEach(function(m){MEMBRES_DAHIRA.push({nom:m.nom+' '+m.prenom,info:m.postes.join(', ')})})}catch(e){}
+try{COMMISSIONS.splice(0,COMMISSIONS.length);COMMISSIONS_SITE.forEach(function(c){COMMISSIONS.push({nom:c.nom,resp:c.resp||'',txt:c.txt||''})})}catch(e){}
+})();
+</script>
+
 
 
 
